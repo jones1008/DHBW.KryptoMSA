@@ -16,4 +16,7 @@ public enum Configuration {
 
     // component
     public String componentDirectory = userDirectory + fileSeparator + "component";
+
+    // cracker
+    public final int crackTimeout = 30; // in Sekunden
 }

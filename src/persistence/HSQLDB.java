@@ -1,9 +1,9 @@
 package persistence;
 
 import configuration.Configuration;
+import companyNetwork.Subscriber;
 
 import java.sql.*;
-import java.util.concurrent.Flow;
 
 public enum HSQLDB {
     instance;
@@ -231,7 +231,7 @@ public enum HSQLDB {
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO channel (").append("name").append(",").append("participant_01").append(",").append("participant_02").append(")");
         sqlStringBuilder.append(" VALUES ");
-        sqlStringBuilder.append("(").append(name).append(",").append("'").append(participant01.id).append("'").append(",").append("'").append(participant02.id).append("'");
+        sqlStringBuilder.append("(").append(name).append(",").append("'").append(participant01.getId()).append("'").append(",").append("'").append(participant02.getId()).append("'");
         sqlStringBuilder.append(")");
         System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
         update(sqlStringBuilder.toString());
@@ -245,8 +245,8 @@ public enum HSQLDB {
         return hasResult(sql);
     }
     public boolean channelExists(Subscriber participant01, Subscriber participant02) {
-        String sql = "SELECT * FROM channel WHERE participant01='"+participant01.id+"' " +
-                     "AND participant02='"+participant02.id+"'";
+        String sql = "SELECT * FROM channel WHERE participant01='"+participant01.getId()+"' " +
+                     "AND participant02='"+participant02.getId()+"'";
         return hasResult(sql);
     }
 
