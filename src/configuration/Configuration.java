@@ -1,5 +1,7 @@
 package configuration;
 
+import application.Algorithm;
+
 public enum Configuration {
     instance;
 
@@ -15,5 +17,24 @@ public enum Configuration {
     public final String password = "";
 
     // component
-    public String componentDirectory = userDirectory + fileSeparator + "component";
+    public String componentsDirectory = userDirectory + fileSeparator + "components" + fileSeparator;
+    public Algorithm algorithm = Algorithm.SHIFT;
+
+    public String getComponentPath() {
+        String algo = "";
+        switch (algorithm) {
+            case SHIFT:
+                algo = "shift";
+                break;
+            case RSA:
+                algo = "rsa";
+                break;
+        }
+
+        return componentsDirectory + "component_" + algo
+                + fileSeparator + "jar" + fileSeparator + algo + ".jar";
+    }
+
+    // keys
+    public String keyfilesDirectory = userDirectory + fileSeparator + "keyfiles" + fileSeparator;
 }
