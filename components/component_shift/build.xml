@@ -1,0 +1,25 @@
+<project>
+
+    <target name="clean">
+        <delete dir="build"/>
+        <delete dir="jar"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build"/>
+        <javac srcdir="src" destdir="build"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="jar"/>
+        <jar destfile="jar/shift.jar" basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="shift"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="all" depends="clean, compile, jar">
+    </target>
+
+</project>
