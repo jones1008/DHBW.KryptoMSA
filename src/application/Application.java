@@ -11,10 +11,16 @@ public class Application {
         HSQLDB.instance.dropTableTypes();
 
         HSQLDB.instance.createTableTypes();
+        HSQLDB.instance.createTableAlgorithms();
         HSQLDB.instance.createTableParticipants();
+        HSQLDB.instance.createTableChannel();
+        HSQLDB.instance.createTableMessages();
 
         HSQLDB.instance.insertDataTableTypes("normal");
         HSQLDB.instance.insertDataTableTypes("intruder");
+
+        HSQLDB.instance.insertDataTableAlgorithms("rsa");
+        HSQLDB.instance.insertDataTableAlgorithms("shift");
 
         HSQLDB.instance.insertDataTableParticipants("branch_hkg", 1);
         HSQLDB.instance.insertDataTableParticipants("branch_cpt", 1);

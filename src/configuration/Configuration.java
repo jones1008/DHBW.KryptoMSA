@@ -18,6 +18,7 @@ public enum Configuration {
 
     // component
     public String componentsDirectory = userDirectory + fileSeparator + "components" + fileSeparator;
+    public String componentDirectory = userDirectory + fileSeparator + "component";
     public Algorithm algorithm = Algorithm.SHIFT;
 
     public String getComponentPath() {
@@ -37,4 +38,7 @@ public enum Configuration {
 
     // keys
     public String keyfilesDirectory = userDirectory + fileSeparator + "keyfiles" + fileSeparator;
+
+    // cracker
+    public final int crackTimeout = 30; // in Sekunden
 }
