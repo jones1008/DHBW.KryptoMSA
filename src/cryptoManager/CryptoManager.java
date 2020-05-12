@@ -127,7 +127,7 @@ public class CryptoManager implements ICryptoManager
         }
     }
 
-    private Method createCrackMethod() {
+    private void createCrackMethod() {
         Object instance;
         try {
             URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
@@ -139,7 +139,6 @@ public class CryptoManager implements ICryptoManager
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private String decryptRSA(String message, KeyRSA key)
