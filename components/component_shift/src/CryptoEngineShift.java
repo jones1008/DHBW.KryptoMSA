@@ -1,19 +1,18 @@
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 
-public class CryptoEngineShift
+public class CryptoEngineSHIFT
 {
-
-    private static CryptoEngineShift instance = new CryptoEngineShift();
+    private static CryptoEngineSHIFT instance = new CryptoEngineSHIFT();
 
     public Port port;
 
-    private CryptoEngineShift()
+    private CryptoEngineSHIFT()
     {
         port = new Port();
     }
 
-    public static CryptoEngineShift getInstance()
+    public static CryptoEngineSHIFT getInstance()
     {
         return instance;
     }
