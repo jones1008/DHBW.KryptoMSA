@@ -1,9 +1,15 @@
 package application;
 
+import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
 public class Application {
-    public static void main(String... args) {
+    public static void main(String... args)
+    {
+        
+    }
+
+    private static void hsqldbDemo() {
         // hsqldb demo
         HSQLDB.instance.setupConnection();
 
@@ -30,5 +36,27 @@ public class Application {
         HSQLDB.instance.insertDataTableParticipants("msa", 2);
 
         HSQLDB.instance.shutdown();
+    }
+
+    private static void cryptoManagerDemo() {
+        CryptoManager manager = new CryptoManager();
+        System.out.println("RSA:");
+        String message = "dhbw";
+        String algorithm = "rsa";
+        String keyfile = "rsa_keyfile.json";
+        String encrypted = manager.encrypt(message, algorithm, keyfile);
+        String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
+        System.out.println("message: " + message);
+        System.out.println("encrypted: " + encrypted);
+        System.out.println("decrypted: " + decrypted);
+
+        System.out.println("SHIFT:");
+        algorithm = "shift";
+        keyfile = "shift_keyfile.json";
+        encrypted = manager.encrypt(message, algorithm, keyfile);
+        decrypted = manager.decrypt(encrypted, algorithm, keyfile);
+        System.out.println("message: " + message);
+        System.out.println("encrypted: " + encrypted);
+        System.out.println("decrypted: " + decrypted);
     }
 }
