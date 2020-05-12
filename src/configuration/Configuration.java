@@ -37,7 +37,7 @@ public enum Configuration {
     }
 
     // keys
-    public String keyfilesDirectory = userDirectory + fileSeparator + "keyfiles" + fileSeparator;
+    public String keyfilesDirectory = userDirectory + fileSeparator + "src" + fileSeparator + "keyfiles" + fileSeparator;
 
     // cracker
     public final int crackTimeout = 30; // in Sekunden
