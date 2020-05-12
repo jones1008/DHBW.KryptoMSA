@@ -12,7 +12,7 @@ public class CryptoManager implements ICryptoManager
 {
     private Object port;
     private Method cryptoMethod;
-    private Method crack;
+    private Method crackMethod;
 
     private IKeyReader keyReader;
 
@@ -79,12 +79,13 @@ public class CryptoManager implements ICryptoManager
     public String crack(String message, int timeout)
     {
         try {
-            return (String) this.crack.invoke(message, timeout);
+            return (String) this.crackMethod.invoke(message, timeout);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+
 
     private boolean setAlgorithm(String algorithm)
     {
@@ -130,11 +131,11 @@ public class CryptoManager implements ICryptoManager
         Object instance;
         try {
             URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
-            URLClassLoader urlClassLoader = new URLClassLoader(urls, companyNetwork.CryptoManager.class.getClassLoader());
+            URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName(Configuration.instance.algorithm.toString(), true, urlClassLoader);
             instance = clazz.getMethod("getInstance").invoke(null);
             port = clazz.getDeclaredField("port").get(instance);
-            return port.getClass().getMethod("crack", String.class, String.class);
+            crackMethod = port.getClass().getMethod("crack", String.class, String.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
