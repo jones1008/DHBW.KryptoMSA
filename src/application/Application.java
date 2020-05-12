@@ -6,7 +6,7 @@ import persistence.HSQLDB;
 public class Application {
     public static void main(String... args)
     {
-        
+        cryptoManagerDemo();
     }
 
     private static void hsqldbDemo() {

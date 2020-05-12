@@ -1,9 +1,9 @@
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.util.Base64;
 
 public class CryptoEngineRSA
 {
-
     private static CryptoEngineRSA instance = new CryptoEngineRSA();
 
     public Port port;
@@ -23,9 +23,9 @@ public class CryptoEngineRSA
         return new String(msg);
     }
 
-    private String innerMethodEncrypt(String message, int e, int n) {
-        byte[] bytes = message.getBytes(Charset.defaultCharset());
-        return crypt(new BigInteger(bytes), BigInteger.valueOf(e), BigInteger.valueOf(n)).toByteArray().toString();
+    private byte[] innerMethodEncrypt(String plainMessage, int e, int n) {
+        byte[] bytes = plainMessage.getBytes();
+        return crypt(new BigInteger(bytes), BigInteger.valueOf(e), BigInteger.valueOf(n)).toByteArray();
     }
 
     private BigInteger crypt(BigInteger message, BigInteger e, BigInteger n) {
@@ -37,12 +37,12 @@ public class CryptoEngineRSA
 
         public String decrypt(String message, int d, int n)
         {
-            return innerMethodDecrypt(message.getBytes(), d, n);
+            return innerMethodDecrypt(Base64.getDecoder().decode(message), d, n);
         }
 
         public String encrypt(String message, int e, int n)
         {
-            return innerMethodEncrypt(message, e, n);
+            return Base64.getEncoder().encodeToString(innerMethodEncrypt(message, e, n));
         }
     }
 }
