@@ -87,5 +87,14 @@ public class Application {
         System.out.println("message: " + message);
         System.out.println("cracked: ");
         System.out.println(cracked);
+
+        System.out.println();
+        System.out.println("Crack RSA: ");
+        message = "127881381553746";
+        algorithm = "rsa";
+        cracked = manager.crack(message, algorithm);
+        System.out.println("message: " + message);
+        System.out.println("cracked: ");
+        System.out.println(cracked);
     }
 }

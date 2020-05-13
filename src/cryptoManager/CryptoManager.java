@@ -5,6 +5,7 @@ import configuration.Configuration;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -80,12 +81,19 @@ public class CryptoManager implements ICryptoManager
     {
         setAlgorithm(algorithm);
         createCrackMethod();
-        try {
-            return (String) crackMethod.invoke(port, message, Configuration.instance.crackTimeout);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        String result = "";
+
+        switch (Configuration.instance.algorithm) {
+            case SHIFT:
+                result = crackShift(message);
+                break;
+            case RSA:
+                result = crackRSA(message);
+                break;
         }
-        return null;
+
+        return result;
     }
 
 
@@ -139,7 +147,14 @@ public class CryptoManager implements ICryptoManager
             instance = clazz.getMethod("getInstance").invoke(null);
             port = clazz.getDeclaredField("port").get(instance);
 
-            crackMethod = port.getClass().getMethod("crack", String.class, int.class); // parameters: String message, int timeout
+            switch (Configuration.instance.algorithm) {
+                case SHIFT:
+                    crackMethod = port.getClass().getMethod("crack", String.class, int.class); // shfit parameters: String message, int timeout
+                    break;
+                case RSA:
+                    crackMethod = port.getClass().getMethod("crack", BigInteger.class, BigInteger.class, BigInteger.class, int.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n, int timeout
+                    break;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -181,5 +196,27 @@ public class CryptoManager implements ICryptoManager
             e.printStackTrace();
         }
         return "";
+    }
+
+    private String crackShift(String message) {
+        try {
+            return (String) crackMethod.invoke(port, message, Configuration.instance.crackTimeout);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String crackRSA(String message) {
+        BigInteger e = BigInteger.valueOf(12371);
+        BigInteger n = new BigInteger("517815623413379");
+
+        try {
+            String plainMessage = (String) crackMethod.invoke(port, new BigInteger(message), e, n, Configuration.instance.crackTimeout);
+            return plainMessage;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 }
