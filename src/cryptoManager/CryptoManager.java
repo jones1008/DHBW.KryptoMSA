@@ -5,6 +5,7 @@ import configuration.Configuration;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -108,7 +109,7 @@ public class CryptoManager implements ICryptoManager
         Object instance;
 
         try {
-            URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getCryptoComponentPath()).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CryptoEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 
@@ -117,10 +118,10 @@ public class CryptoManager implements ICryptoManager
 
             switch (Configuration.instance.algorithm) {
                 case SHIFT:
-                    cryptoMethod = port.getClass().getMethod(methodType, String.class, int.class); // parameters: String message, int key
+                    cryptoMethod = port.getClass().getMethod(methodType, String.class, BigInteger.class); // parameters: String message, int key
                     break;
                 case RSA:
-                    cryptoMethod = port.getClass().getMethod(methodType, String.class, int.class, int.class); // parameters: String message, int d/e, int n
+                    cryptoMethod = port.getClass().getMethod(methodType, String.class, BigInteger.class, BigInteger.class); // parameters: String message, int d/e, int n
                     break;
             }
         }
@@ -132,7 +133,7 @@ public class CryptoManager implements ICryptoManager
     private void createCrackMethod() {
         Object instance;
         try {
-            URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getCrackerComponentPath()).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CrackerEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 
@@ -149,7 +150,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
-            //return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
+//            return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getD(), key.getN());
         } catch (Exception e)
         {
@@ -162,7 +163,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
-            //return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
+//            return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getE(), key.getN());
         } catch (Exception e)
         {

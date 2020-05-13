@@ -1,14 +1,13 @@
 package application;
 
-import cryptoManager.CryptoEngineRSA;
 import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
 public class Application {
     public static void main(String... args)
     {
-        //cryptoManagerDemo();
-        crackerDemo();
+        cryptoManagerDemo();
+//        crackerDemo();
     }
 
     private static void hsqldbDemo() {
