@@ -8,7 +8,7 @@ public class Application {
     {
         cryptoManagerDemo();
         System.out.println();
-        crackerDemo();
+        //crackerDemo();
     }
 
     private static void hsqldbDemo() {
@@ -45,9 +45,9 @@ public class Application {
         System.out.println("-----Crypto Manager Demo-----");
         CryptoManager manager = new CryptoManager();
         System.out.println("RSA:");
-        String message = "morpheus";
+        String message = "dhbw mosbach";
         String algorithm = "rsa";
-        String keyfile = "rsa_keyfile.json";
+        String keyfile = "rsa_keyfile2.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
         String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
         System.out.println("message: " + message);
