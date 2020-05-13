@@ -74,7 +74,12 @@ public class CryptoManager implements ICryptoManager
 
     public String[] showAlgorithms()
     {
-        return new String[0];
+        String[] algorithms = new String[Algorithm.values().length];
+        for (int i = 0; i < Algorithm.values().length; i++)
+        {
+            algorithms[i] = Algorithm.values()[i].toString();
+        }
+        return algorithms;
     }
 
     public String crack(String message, String algorithm)

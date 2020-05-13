@@ -3,6 +3,8 @@ package application;
 import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
+import java.util.Scanner;
+
 public class Application {
     public static void main(String... args)
     {
@@ -44,6 +46,13 @@ public class Application {
     private static void cryptoManagerDemo() {
         System.out.println("-----Crypto Manager Demo-----");
         CryptoManager manager = new CryptoManager();
+        System.out.println("Algorithms: ");
+        for (String algo: manager.showAlgorithms())
+        {
+            System.out.println(algo);
+        }
+
+        System.out.println();
         System.out.println("RSA:");
         String message = "dhbw mosbach";
         String algorithm = "rsa";
