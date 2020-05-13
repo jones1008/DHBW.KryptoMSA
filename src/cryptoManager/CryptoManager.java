@@ -109,7 +109,7 @@ public class CryptoManager implements ICryptoManager
         Object instance;
 
         try {
-            URL[] urls = {new File(Configuration.instance.getCryptoComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getComponentPath(false)).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CryptoEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 
@@ -133,7 +133,7 @@ public class CryptoManager implements ICryptoManager
     private void createCrackMethod() {
         Object instance;
         try {
-            URL[] urls = {new File(Configuration.instance.getCrackerComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CrackerEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 
@@ -150,7 +150,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
-//            return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
+            //return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getD(), key.getN());
         } catch (Exception e)
         {
@@ -163,7 +163,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
-//            return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
+            //return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getE(), key.getN());
         } catch (Exception e)
         {
