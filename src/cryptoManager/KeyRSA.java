@@ -1,23 +1,25 @@
 package cryptoManager;
 
+import java.math.BigInteger;
+
 public class KeyRSA extends Key
 {
-    private int d;
-    private int e;
+    private BigInteger d;
+    private BigInteger e;
 
-    public KeyRSA(int n, int d, int e)
+    public KeyRSA(BigInteger n, BigInteger d, BigInteger e)
     {
         super(n);
         this.d = d;
         this.e = e;
     }
 
-    public int getD()
+    public BigInteger getD()
     {
         return d;
     }
 
-    public int getE()
+    public BigInteger getE()
     {
         return e;
     }

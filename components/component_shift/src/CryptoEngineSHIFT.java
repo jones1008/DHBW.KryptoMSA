@@ -17,22 +17,22 @@ public class CryptoEngineSHIFT
         return instance;
     }
 
-    private String innerMethodDecrypt(String message, int key) {
+    private String innerMethodDecrypt(String message, BigInteger key) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < message.length(); i++) {
-            char character = (char) (message.codePointAt(i) - key);
+            char character = (char) (message.codePointAt(i) - key.intValue());
             stringBuilder.append(character);
         }
 
         return stringBuilder.toString();
     }
 
-    private String innerMethodEncrypt(String message, int key) {
+    private String innerMethodEncrypt(String message, BigInteger key) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < message.length(); i++) {
-            char character = (char) (message.codePointAt(i) + key);
+            char character = (char) (message.codePointAt(i) + key.intValue());
             stringBuilder.append(character);
         }
 
@@ -42,12 +42,12 @@ public class CryptoEngineSHIFT
     public class Port implements ICryptoEngine
     {
 
-        public String decrypt(String message, int key)
+        public String decrypt(String message, BigInteger key)
         {
             return innerMethodDecrypt(message, key);
         }
 
-        public String encrypt(String message, int key)
+        public String encrypt(String message, BigInteger key)
         {
             return innerMethodEncrypt(message, key);
         }

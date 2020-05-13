@@ -1,15 +1,17 @@
 package cryptoManager;
 
+import java.math.BigInteger;
+
 public abstract class Key
 {
-    protected int n;
+    protected BigInteger n;
 
-    public Key(int n) {
+    public Key(BigInteger n) {
         this.n = n;
     }
 
 
-    public int getN()
+    public BigInteger getN()
     {
         return n;
     }

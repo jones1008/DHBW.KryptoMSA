@@ -18,14 +18,16 @@ public class CryptoEngineRSA
         return instance;
     }
 
-    private String innerMethodDecrypt(byte[] message, int d, int n) {
-        byte[] msg = crypt(new BigInteger(message), BigInteger.valueOf(d), BigInteger.valueOf(n)).toByteArray();
+    private String innerMethodDecrypt(byte[] message, BigInteger d, BigInteger n) {
+        byte[] msg = crypt(new BigInteger(message), d, n).toByteArray();
         return new String(msg);
     }
 
-    private byte[] innerMethodEncrypt(String plainMessage, int e, int n) {
-        byte[] bytes = plainMessage.getBytes();
-        return crypt(new BigInteger(bytes), BigInteger.valueOf(e), BigInteger.valueOf(n)).toByteArray();
+    private byte[] innerMethodEncrypt(String plainMessage, BigInteger e, BigInteger n) {
+        byte[] bytes = plainMessage.getBytes(Charset.defaultCharset());
+        BigInteger bytesBigInteger = new BigInteger(bytes);
+        BigInteger cipher = crypt(bytesBigInteger, e, n);
+        return cipher.toByteArray();
     }
 
     private BigInteger crypt(BigInteger message, BigInteger e, BigInteger n) {
@@ -35,12 +37,12 @@ public class CryptoEngineRSA
     public class Port implements ICryptoEngine
     {
 
-        public String decrypt(String message, int d, int n)
+        public String decrypt(String message, BigInteger d, BigInteger n)
         {
             return innerMethodDecrypt(Base64.getDecoder().decode(message), d, n);
         }
 
-        public String encrypt(String message, int e, int n)
+        public String encrypt(String message, BigInteger e, BigInteger n)
         {
             return Base64.getEncoder().encodeToString(innerMethodEncrypt(message, e, n));
         }
