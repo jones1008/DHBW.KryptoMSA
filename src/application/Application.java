@@ -45,7 +45,7 @@ public class Application {
         System.out.println("-----Crypto Manager Demo-----");
         CryptoManager manager = new CryptoManager();
         System.out.println("RSA:");
-        String message = "dhbw";
+        String message = "morpheus";
         String algorithm = "rsa";
         String keyfile = "rsa_keyfile.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
