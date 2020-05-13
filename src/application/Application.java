@@ -1,12 +1,14 @@
 package application;
 
+import cryptoManager.CryptoEngineRSA;
 import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
 public class Application {
     public static void main(String... args)
     {
-        cryptoManagerDemo();
+        //cryptoManagerDemo();
+        crackerDemo();
     }
 
     private static void hsqldbDemo() {
@@ -58,5 +60,16 @@ public class Application {
         System.out.println("message: " + message);
         System.out.println("encrypted: " + encrypted);
         System.out.println("decrypted: " + decrypted);
+    }
+
+    private static void crackerDemo() {
+        CryptoManager manager = new CryptoManager();
+        System.out.println("Crack Shift: ");
+        String message = "prvedfk";
+        String algorithm = "shift";
+        String cracked = manager.crack(message, algorithm);
+        System.out.println("message: " + message);
+        System.out.println("cracked: ");
+        System.out.println(cracked);
     }
 }

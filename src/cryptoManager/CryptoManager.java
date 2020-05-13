@@ -76,10 +76,12 @@ public class CryptoManager implements ICryptoManager
         return new String[0];
     }
 
-    public String crack(String message, int timeout)
+    public String crack(String message, String algorithm)
     {
+        setAlgorithm(algorithm);
+        createCrackMethod();
         try {
-            return (String) this.crackMethod.invoke(message, timeout);
+            return (String) crackMethod.invoke(port, message, Configuration.instance.crackTimeout);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,10 +134,12 @@ public class CryptoManager implements ICryptoManager
         try {
             URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
-            Class clazz = Class.forName(Configuration.instance.algorithm.toString(), true, urlClassLoader);
+            Class clazz = Class.forName("CrackerEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
+
             instance = clazz.getMethod("getInstance").invoke(null);
             port = clazz.getDeclaredField("port").get(instance);
-            crackMethod = port.getClass().getMethod("crack", String.class, String.class);
+
+            crackMethod = port.getClass().getMethod("crack", String.class, int.class); // parameters: String message, int timeout
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,6 +149,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
+            //return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getD(), key.getN());
         } catch (Exception e)
         {
@@ -157,6 +162,7 @@ public class CryptoManager implements ICryptoManager
     {
         try
         {
+            //return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
             return (String) cryptoMethod.invoke(port, message, key.getE(), key.getN());
         } catch (Exception e)
         {
