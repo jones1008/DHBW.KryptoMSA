@@ -84,7 +84,11 @@ public class CryptoManager implements ICryptoManager
 
     public String crack(String message, String algorithm)
     {
-        setAlgorithm(algorithm);
+        if (!setAlgorithm(algorithm))
+        {
+            return null;
+        }
+
         createCrackMethod();
 
         String result = "";

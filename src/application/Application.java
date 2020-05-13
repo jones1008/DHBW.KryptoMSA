@@ -54,7 +54,7 @@ public class Application {
 
         System.out.println();
         System.out.println("RSA:");
-        String message = "dhbw mosbach";
+        String message = "morpheus";
         String algorithm = "rsa";
         String keyfile = "rsa_keyfile2.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
