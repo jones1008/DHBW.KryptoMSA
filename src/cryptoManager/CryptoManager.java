@@ -108,7 +108,7 @@ public class CryptoManager implements ICryptoManager
         Object instance;
 
         try {
-            URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getComponentPath(false)).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CryptoEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 
@@ -132,7 +132,7 @@ public class CryptoManager implements ICryptoManager
     private void createCrackMethod() {
         Object instance;
         try {
-            URL[] urls = {new File(Configuration.instance.getComponentPath()).toURI().toURL()};
+            URL[] urls = {new File(Configuration.instance.getComponentPath(true)).toURI().toURL()};
             URLClassLoader urlClassLoader = new URLClassLoader(urls, CryptoManager.class.getClassLoader());
             Class clazz = Class.forName("CrackerEngine" + Configuration.instance.algorithm.toString(), true, urlClassLoader);
 

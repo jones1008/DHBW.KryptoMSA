@@ -21,7 +21,11 @@ public enum Configuration {
     public String componentDirectory = userDirectory + fileSeparator + "component";
     public Algorithm algorithm = Algorithm.SHIFT;
 
-    public String getComponentPath() {
+    public String getComponentPath(boolean cracker) {
+        String crackerExtension = "";
+        if (cracker) {
+            crackerExtension = "_cracker";
+        }
         String algo = "";
         switch (algorithm) {
             case SHIFT:
@@ -32,8 +36,9 @@ public enum Configuration {
                 break;
         }
 
-        return componentsDirectory + "component_" + algo
-                + fileSeparator + "jar" + fileSeparator + algo + ".jar";
+        return componentsDirectory + "component_" + algo + crackerExtension
+                + fileSeparator + "jar" + fileSeparator + algo + crackerExtension
+                + ".jar";
     }
 
     // keys
