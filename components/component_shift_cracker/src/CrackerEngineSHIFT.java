@@ -20,19 +20,20 @@ public class CrackerEngineSHIFT
     }
 
     private String innerMethodCrack(String message, int timeout) {
+        String failedString = "cracking encrypted message \"" + message + "\" failed";
         try
         {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             List<Future<String>> future = executor.invokeAll(Arrays.asList(new CrackTask(message)), timeout, TimeUnit.SECONDS);
             executor.shutdown();
             if (future.get(0).isCancelled()) {
-                return "cracking encrypted message \"" + message + "\" failed";
+                return failedString;
             }
             return future.get(0).get();
         } catch (InterruptedException | ExecutionException e)
         {
             e.printStackTrace();
-            return "cracking encrypted message \"" + message + "\" failed";
+            return failedString;
         }
     }
 
@@ -45,7 +46,7 @@ public class CrackerEngineSHIFT
 
         @Override
         public String call() throws Exception {
-            long startTime = System.currentTimeMillis();
+            //long startTime = System.currentTimeMillis();
             String source = message.toUpperCase();
             char[] sourceText = new char[source.length()];
             for (int i = 0; i < source.length(); i++)
@@ -74,8 +75,8 @@ public class CrackerEngineSHIFT
                     possibleResults.append(System.getProperty("line.separator"));
                 }
             }
-            long time = System.currentTimeMillis() - startTime;
-            possibleResults.append("Time: " + time);
+            //long time = System.currentTimeMillis() - startTime;
+            //possibleResults.append("Time: " + time);
             return possibleResults.toString();
         }
     }
