@@ -125,7 +125,7 @@ public class CryptoManager implements ICryptoManager
 
             switch (Configuration.instance.algorithm) {
                 case SHIFT:
-                    cryptoMethod = port.getClass().getMethod(methodType, String.class, BigInteger.class); // parameters: String message, int key
+                    cryptoMethod = port.getClass().getMethod(methodType, String.class, int.class); // parameters: String message, int key
                     break;
                 case RSA:
                     cryptoMethod = port.getClass().getMethod(methodType, String.class, BigInteger.class, BigInteger.class); // parameters: String message, int d/e, int n

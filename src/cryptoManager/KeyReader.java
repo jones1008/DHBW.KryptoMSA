@@ -5,7 +5,6 @@ import configuration.Configuration;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.math.BigInteger;
 
 public class KeyReader implements IKeyReader
 {
@@ -16,7 +15,8 @@ public class KeyReader implements IKeyReader
         {
             BufferedReader reader = new BufferedReader(new FileReader(Configuration.instance.keyfilesDirectory + keyfile));
             String currentLine;
-            BigInteger d = BigInteger.valueOf(0), e = BigInteger.valueOf(0), n = BigInteger.valueOf(0), shiftKey = BigInteger.valueOf(0);
+            int shiftKey = 0;
+            String n = "", d = "", e = "";
 
             while ((currentLine = reader.readLine()) != null) {
                 if (currentLine.charAt(0) != '{' && currentLine.charAt(0) != '}')
@@ -30,15 +30,15 @@ public class KeyReader implements IKeyReader
                     {
                         if (splitted[0].contains("d"))
                         {
-                            d = new BigInteger(splitted[1].trim()); // trim() removes spaces from String
+                            d = splitted[1].trim(); // trim() removes spaces from String
                         }
                         if (splitted[0].contains("e"))
                         {
-                            e = new BigInteger(splitted[1].trim()); // trim() removes spaces from String
+                            e = splitted[1].trim(); // trim() removes spaces from String
                         }
                         if (splitted[0].contains("n"))
                         {
-                            n = new BigInteger(splitted[1].trim()); // trim() removes spaces from String
+                            n = splitted[1].trim(); // trim() removes spaces from String
                         }
                     }
 
@@ -46,7 +46,7 @@ public class KeyReader implements IKeyReader
                     {
                         if (splitted[0].contains("key"))
                         {
-                            shiftKey = new BigInteger(splitted[1].trim());
+                            shiftKey = Integer.parseInt(splitted[1].trim());
                         }
                     }
                 }
