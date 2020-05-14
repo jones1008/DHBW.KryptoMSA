@@ -171,6 +171,9 @@ public class CryptoManager implements ICryptoManager
 
     private String decryptRSA(String message, KeyRSA key)
     {
+        if (key == null) {
+            return "Key not found";
+        }
         try
         {
             //return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
@@ -184,6 +187,9 @@ public class CryptoManager implements ICryptoManager
 
     private String encryptRSA(String message, KeyRSA key)
     {
+        if (key == null) {
+            return "Key not found";
+        }
         try
         {
             //return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
@@ -197,6 +203,9 @@ public class CryptoManager implements ICryptoManager
 
     private String cryptShift(String message, KeyShift key)
     {
+        if (key == null) {
+            return "Key not found";
+        }
         try
         {
             return (String) cryptoMethod.invoke(port, message, key.getN());
