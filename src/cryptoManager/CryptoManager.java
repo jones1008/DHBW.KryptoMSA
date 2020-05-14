@@ -26,12 +26,10 @@ public class CryptoManager implements ICryptoManager
     private ILogger logger = null;
 
     public CryptoManager() {
-        this.keyReader = new KeyReader();
         this.debugActive = false;
     }
 
     public CryptoManager(boolean debugActive) {
-        this.keyReader = new KeyReader();
         this.debugActive = debugActive;
     }
 
@@ -44,20 +42,7 @@ public class CryptoManager implements ICryptoManager
 
         createCryptoMethod("decrypt");
 
-        String result = "";
-
-        switch (Configuration.instance.algorithm)
-        {
-            case RSA:
-                KeyRSA keyRSA = (KeyRSA) keyReader.readKey(keyfile, Algorithm.RSA);
-                result = decryptRSA(message, keyRSA);
-                break;
-            case SHIFT:
-                KeyShift keyShift = (KeyShift) keyReader.readKey(keyfile, Algorithm.SHIFT);
-                result = cryptShift(message, keyShift);
-                break;
-        }
-        return result;
+        return crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
     }
 
     public String encrypt(String message, String algorithm, String keyfile)
@@ -69,22 +54,8 @@ public class CryptoManager implements ICryptoManager
         log("creating encryption method at runtime from component");
         createCryptoMethod("encrypt");
 
-        String result = "";
-
         log("detected encryption method '" + Configuration.instance.algorithm + "'");
-        switch (Configuration.instance.algorithm)
-        {
-            case RSA:
-                KeyRSA keyRSA = (KeyRSA) keyReader.readKey(keyfile, Algorithm.RSA);
-                result = encryptRSA(message, keyRSA);
-                break;
-            case SHIFT:
-                KeyShift keyShift = (KeyShift) keyReader.readKey(keyfile, Algorithm.SHIFT);
-                result = cryptShift(message, keyShift);
-                break;
-        }
-
-        return result;
+        return crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
     }
 
     public String[] showAlgorithms()
@@ -147,14 +118,7 @@ public class CryptoManager implements ICryptoManager
             instance = clazz.getMethod("getInstance").invoke(null);
             port = clazz.getDeclaredField("port").get(instance);
 
-            switch (Configuration.instance.algorithm) {
-                case SHIFT:
-                    cryptoMethod = port.getClass().getMethod(methodType, String.class, int.class); // parameters: String message, int key
-                    break;
-                case RSA:
-                    cryptoMethod = port.getClass().getMethod(methodType, String.class, BigInteger.class, BigInteger.class); // parameters: String message, int d/e, int n
-                    break;
-            }
+            cryptoMethod = port.getClass().getMethod(methodType, String.class,File.class); // parameters: String message, File keyfile
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -176,7 +140,7 @@ public class CryptoManager implements ICryptoManager
                     crackMethod = port.getClass().getMethod("decrypt", String.class); // shfit parameters: String message
                     break;
                 case RSA:
-                    crackMethod = port.getClass().getMethod("decrypt", BigInteger.class, BigInteger.class, BigInteger.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n
+                    crackMethod = port.getClass().getMethod("decrypt", BigInteger.class, File.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n
                     break;
             }
         } catch (Exception e) {
@@ -184,58 +148,16 @@ public class CryptoManager implements ICryptoManager
         }
     }
 
-    private String decryptRSA(String message, KeyRSA key)
+    private String crypt(String message, File keyfile)
     {
-        if (key == null) {
-            log("Key of RSA-Decryption is null. Make sure to pass a keyfile along when decrypting the message.");
-            return "Key not found";
-        }
         try
         {
-            //return CryptoEngineRSA.decrypt(message, key.getD(), key.getN());
-            log("Starting decryption with rsa");
-            return (String) cryptoMethod.invoke(port, message, key.getD(), key.getN());
+            log("Starting decryption");
+            return (String) cryptoMethod.invoke(port, message, keyfile);
         } catch (Exception e)
         {
             e.printStackTrace();
-            log("Error while decryption with rsa: " + e.getMessage());
-        }
-        return "";
-    }
-
-    private String encryptRSA(String message, KeyRSA key)
-    {
-        if (key == null) {
-            log("Key of RSA-Encryption is null. Make sure to pass a keyfile along when encrypting the message.");
-            return "Key not found";
-        }
-        try
-        {
-            //return CryptoEngineRSA.encrypt(message, key.getE(), key.getN());
-            log("Starting encryption with rsa");
-            return (String) cryptoMethod.invoke(port, message, key.getE(), key.getN());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            log("Error while encryption with rsa: " + e.getMessage());
-        }
-        return "";
-    }
-
-    private String cryptShift(String message, KeyShift key)
-    {
-        if (key == null) {
-            log("Key of Shift-en/decryption is null. Make sure to pass a keyfile along when en/decrypting the message.");
-            return "Key not found";
-        }
-        try
-        {
-            log("Starting en/decryption with shift");
-            return (String) cryptoMethod.invoke(port, message, key.getN());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            log("Error while en/decryption with shift: " + e.getMessage());
+            log("Error while decryption: " + e.getMessage());
         }
         return "";
     }
@@ -262,20 +184,23 @@ public class CryptoManager implements ICryptoManager
         File[] rsaKeyfiles = new File(Configuration.instance.keyfilesDirectory).listFiles((dir, name) -> name.toLowerCase().startsWith("rsa"));
         List<Callable<String>> tasks = new ArrayList<>();
         for (File file : rsaKeyfiles) {
-            KeyRSA key = (KeyRSA) keyReader.readKey(file.getName(), Algorithm.RSA);
-            tasks.add(new RSACrackTask(message, key, crackMethod, port));
+            tasks.add(new RSACrackTask(message, file, crackMethod, port));
         }
 
         String failedString = "cracking encrypted message \"" + message + "\" failed";
         try
         {
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            List<Future<String>> future = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
+            List<Future<String>> futures = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
             executor.shutdown();
-            if (future.get(0).isCancelled()) {
-                return failedString;
+
+            for (Future<String> future : futures) {
+                if (!future.isCancelled()) {
+                    return future.get();
+                }
             }
-            return future.get(0).get();
+
+            return failedString;
         } catch (Exception ex)
         {
             ex.printStackTrace();

@@ -1,6 +1,6 @@
-import java.math.BigInteger;
+import java.io.File;
 
 public interface ICryptoEngine {
-    String decrypt(String message, BigInteger d, BigInteger n);
-    String encrypt(String message, BigInteger e, BigInteger n);
+    String decrypt(String message, File keyfile);
+    String encrypt(String message, File keyfile);
 }
