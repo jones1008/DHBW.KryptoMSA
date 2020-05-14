@@ -19,66 +19,39 @@ public class CrackerEngineSHIFT
         return instance;
     }
 
-    private String innerMethodCrack(String message, int timeout) {
-        String failedString = "cracking encrypted message \"" + message + "\" failed";
-        try
+    private String innerMethodCrack(String message) {
+        //long startTime = System.currentTimeMillis();
+        String source = message.toUpperCase();
+        char[] sourceText = new char[source.length()];
+        for (int i = 0; i < source.length(); i++)
         {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            List<Future<String>> future = executor.invokeAll(Arrays.asList(new CrackTask(message)), timeout, TimeUnit.SECONDS);
-            executor.shutdown();
-            if (future.get(0).isCancelled()) {
-                return failedString;
-            }
-            return future.get(0).get();
-        } catch (InterruptedException | ExecutionException e)
-        {
-            e.printStackTrace();
-            return failedString;
-        }
-    }
-
-    class CrackTask implements Callable<String> {
-        private String message;
-
-        public CrackTask(String message) {
-            this.message = message;
+            sourceText[i] = source.charAt(i);
         }
 
-        @Override
-        public String call() throws Exception {
-            //long startTime = System.currentTimeMillis();
-            String source = message.toUpperCase();
-            char[] sourceText = new char[source.length()];
-            for (int i = 0; i < source.length(); i++)
-            {
-                sourceText[i] = source.charAt(i);
-            }
+        int[] unicode = new int[source.length()];
+        int[] unicodeCopy = new int[source.length()];
+        String hex;
+        int dec;
 
-            int[] unicode = new int[source.length()];
-            int[] unicodeCopy = new int[source.length()];
-            String hex;
-            int dec;
-
-            for (int count = 0; count < sourceText.length; count++) {
-                hex = Integer.toHexString(sourceText[count]);
-                dec = Integer.parseInt(hex, 16);
-                unicode[count] = dec;
-                unicodeCopy[count] = dec;
-            }
-
-            StringBuilder possibleResults = new StringBuilder();
-
-            for (int shift = 1; shift <= 25; shift++) {
-                String result = smartShift(shift, unicode, unicodeCopy);
-                if (!result.isEmpty()) {
-                    possibleResults.append(result);
-                    possibleResults.append(System.getProperty("line.separator"));
-                }
-            }
-            //long time = System.currentTimeMillis() - startTime;
-            //possibleResults.append("Time: " + time);
-            return possibleResults.toString();
+        for (int count = 0; count < sourceText.length; count++) {
+            hex = Integer.toHexString(sourceText[count]);
+            dec = Integer.parseInt(hex, 16);
+            unicode[count] = dec;
+            unicodeCopy[count] = dec;
         }
+
+        StringBuilder possibleResults = new StringBuilder();
+
+        for (int shift = 1; shift <= 25; shift++) {
+            String result = smartShift(shift, unicode, unicodeCopy);
+            if (!result.isEmpty()) {
+                possibleResults.append(result);
+                possibleResults.append(System.getProperty("line.separator"));
+            }
+        }
+        //long time = System.currentTimeMillis() - startTime;
+        //possibleResults.append("Time: " + time);
+        return possibleResults.toString();
     }
 
     private String smartShift(int shift, int[] unicode, int[] unicodeCopy)
@@ -149,10 +122,9 @@ public class CrackerEngineSHIFT
 
     public class Port implements ICrackerEngine
     {
-
-        public String crack(String message, int timeout)
+        public String decrypt(String message)
         {
-            return innerMethodCrack(message, timeout);
+            return innerMethodCrack(message);
         }
     }
 }

@@ -4,10 +4,17 @@ import application.Algorithm;
 import configuration.Configuration;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.interfaces.RSAKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class CryptoManager implements ICryptoManager
 {
@@ -15,10 +22,18 @@ public class CryptoManager implements ICryptoManager
     private Method cryptoMethod;
     private Method crackMethod;
 
+    private boolean debugActive;
+
     private IKeyReader keyReader;
 
     public CryptoManager() {
         this.keyReader = new KeyReader();
+        this.debugActive = false;
+    }
+
+    public CryptoManager(boolean debugActive) {
+        this.keyReader = new KeyReader();
+        this.debugActive = debugActive;
     }
 
     public String decrypt(String message, String algorithm, String keyfile)
@@ -158,10 +173,10 @@ public class CryptoManager implements ICryptoManager
 
             switch (Configuration.instance.algorithm) {
                 case SHIFT:
-                    crackMethod = port.getClass().getMethod("crack", String.class, int.class); // shfit parameters: String message, int timeout
+                    crackMethod = port.getClass().getMethod("decrypt", String.class); // shfit parameters: String message
                     break;
                 case RSA:
-                    crackMethod = port.getClass().getMethod("crack", BigInteger.class, BigInteger.class, BigInteger.class, int.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n, int timeout
+                    crackMethod = port.getClass().getMethod("decrypt", BigInteger.class, BigInteger.class, BigInteger.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n
                     break;
             }
         } catch (Exception e) {
@@ -217,24 +232,48 @@ public class CryptoManager implements ICryptoManager
     }
 
     private String crackShift(String message) {
-        try {
-            return (String) crackMethod.invoke(port, message, Configuration.instance.crackTimeout);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String failedString = "cracking encrypted message \"" + message + "\" failed";
+        try
+        {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            List<Future<String>> future = executor.invokeAll(Arrays.asList(new ShiftCrackTask(message, crackMethod, port)), Configuration.instance.crackTimeout, TimeUnit.SECONDS);
+            executor.shutdown();
+            if (future.get(0).isCancelled()) {
+                return failedString;
+            }
+            return future.get(0).get();
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedString;
         }
-        return null;
+
+
+
     }
 
     private String crackRSA(String message) {
-        BigInteger e = BigInteger.valueOf(12371);
-        BigInteger n = new BigInteger("517815623413379");
-
-        try {
-            String plainMessage = (String) crackMethod.invoke(port, new BigInteger(message), e, n, Configuration.instance.crackTimeout);
-            return plainMessage;
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        File[] rsaKeyfiles = new File(Configuration.instance.keyfilesDirectory).listFiles((dir, name) -> name.toLowerCase().startsWith("rsa"));
+        List<Callable<String>> tasks = new ArrayList<>();
+        for (File file : rsaKeyfiles) {
+            KeyRSA key = (KeyRSA) keyReader.readKey(file.getName(), Algorithm.RSA);
+            tasks.add(new RSACrackTask(message, key, crackMethod, port));
         }
-        return null;
+
+        String failedString = "cracking encrypted message \"" + message + "\" failed";
+        try
+        {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            List<Future<String>> future = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
+            executor.shutdown();
+            if (future.get(0).isCancelled()) {
+                return failedString;
+            }
+            return future.get(0).get();
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedString;
+        }
     }
 }
