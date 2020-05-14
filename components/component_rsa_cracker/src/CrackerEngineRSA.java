@@ -1,8 +1,14 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.math.BigInteger;
 import java.util.*;
 
 public class CrackerEngineRSA
 {
+    BigInteger e;
+    BigInteger n;
+
     private static CrackerEngineRSA instance = new CrackerEngineRSA();
 
     public Port port;
@@ -17,7 +23,8 @@ public class CrackerEngineRSA
         return instance;
     }
 
-    private String innerMethodDecrypt(BigInteger message, BigInteger e, BigInteger n) {
+    private String innerMethodDecrypt(BigInteger message, File keyfile) {
+        readKeyfile(keyfile);
         BigInteger p, q, d;
         List<BigInteger> factorList = factorize(n);
 
@@ -61,11 +68,45 @@ public class CrackerEngineRSA
         return factorList;
     }
 
+    private void readKeyfile(File keyfile) {
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(keyfile));
+            String currentLine;
+            String stringN = "", stringE = "";
+
+            while ((currentLine = reader.readLine()) != null) {
+                if (currentLine.charAt(0) != '{' && currentLine.charAt(0) != '}')
+                {
+                    String[] splitted = currentLine.split(":");
+                    if (splitted[1].charAt(splitted[1].length()-1) == ',') {
+                        splitted[1] = splitted[1].substring(0, splitted[1].length()-1);
+                    }
+
+                    if (splitted[0].contains("e"))
+                    {
+                        stringE = splitted[1].trim(); // trim() removes spaces from String
+                    }
+                    if (splitted[0].contains("n"))
+                    {
+                        stringN = splitted[1].trim(); // trim() removes spaces from String
+                    }
+                }
+            }
+
+            e = new BigInteger(stringE);
+            n = new BigInteger(stringN);
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     public class Port implements ICrackerEngine
     {
-        public String decrypt(BigInteger message, BigInteger e, BigInteger n)
+        public String decrypt(BigInteger message, File keyfile)
         {
-            return innerMethodDecrypt(message, e, n);
+            return innerMethodDecrypt(message, keyfile);
         }
     }
 }

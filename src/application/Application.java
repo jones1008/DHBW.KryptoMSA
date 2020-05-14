@@ -10,7 +10,7 @@ public class Application {
     {
         cryptoManagerDemo();
         System.out.println();
-        //crackerDemo();
+        crackerDemo();
     }
 
     private static void hsqldbDemo() {
@@ -98,7 +98,7 @@ public class Application {
 
         System.out.println();
         System.out.println("Crack RSA: ");
-        message = "127881381553746";
+        message = "MDFsO4jlFDkcLgM1";
         algorithm = "rsa";
         cracked = manager.crack(message, algorithm);
         System.out.println("message: " + message);
