@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GUI extends Application {
+    private boolean debugActive = false;
+
     public void start(Stage primaryStage) {
         primaryStage.setTitle("MSA | Mosbach Security Agency");
 
@@ -64,7 +66,8 @@ public class GUI extends Application {
     private void keyPressed(KeyCode key, TextArea command, TextArea output) {
         switch (key) {
             case F3:
-                System.out.println("Debugging");
+                System.out.println("Debugging toggled");
+                this.debugActive = !this.debugActive;
                 break;
             case F8:
                 System.out.println("Show Logfile");
@@ -77,7 +80,7 @@ public class GUI extends Application {
 
     private void execute(TextArea command, TextArea output) {
         System.out.println("--- execute ---");
-        CryptoManager manager = new CryptoManager();
+        CryptoManager manager = new CryptoManager(this.debugActive);
         String resultText = "";
 
         if (command.getText().equals("show algorithm")) {
@@ -88,6 +91,20 @@ public class GUI extends Application {
             resultText = decryptMessage(command.getText(), manager);
         } else if (command.getText().matches("crack encrypted message \".*\" using .*")) {
             resultText = crackMessage(command.getText(), manager);
+        } else if (command.getText().matches("register participant .* with type .*")) {
+            resultText = registerParticipant(command.getText());
+        } else if (command.getText().matches("create channel .* from .* to .*")) {
+            resultText = createChannel(command.getText());
+        } else if (command.getText().equals("show channel")) {
+            resultText = showChannel();
+        } else if (command.getText().matches("drop channel .*")) {
+            resultText = dropChannel(command.getText());
+        } else if (command.getText().matches("intrude channel .* by .*")) {
+            resultText = intrudeChannel(command.getText());
+        } else if (command.getText().matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
+            resultText = sendMessage(command.getText());
+        } else {
+            resultText = "Invalid Input";
         }
 
         output.setText(resultText);
@@ -105,6 +122,9 @@ public class GUI extends Application {
     }
 
     private String encryptMessage(String command, CryptoManager manager) {
+        if (this.debugActive) {
+            // create logfile
+        }
         String[] splitted = command.split("\""); // [0]: encrypt message; [1]: [message]; [2]: using [algorithm] and keyfile [keyfile]
         String message = splitted[1];
         splitted = splitted[2].split(" "); // [0]: ""; [1]: using; [2]: [algorithm]; [3]: and; [4]: keyfile; [5]: [keyfile]
@@ -114,6 +134,9 @@ public class GUI extends Application {
     }
 
     private String decryptMessage(String command, CryptoManager manager) {
+        if (this.debugActive) {
+            // create logfile
+        }
         String[] splitted = command.split("\""); // [0]: decrypt message; [1]: [message]; [2]: using [algorithm] and keyfile [keyfile]
         String message = splitted[1];
         splitted = splitted[2].split(" "); // [0]: ""; [1]: using; [2]: [algorithm]; [3]: and; [4]: keyfile; [5]: [keyfile]
@@ -128,5 +151,29 @@ public class GUI extends Application {
         splitted = splitted[2].split(" "); // [0]: ""; [1]: using; [2]: [algorithm]
         String algorithm = splitted[2];
         return manager.crack(message, algorithm);
+    }
+
+    private String registerParticipant(String command) {
+        return "";
+    }
+
+    private String createChannel(String command) {
+        return "";
+    }
+
+    private String showChannel() {
+        return "";
+    }
+
+    private String dropChannel(String command) {
+        return "";
+    }
+
+    private String intrudeChannel(String command) {
+        return "";
+    }
+
+    private String sendMessage(String command) {
+        return "";
     }
 }
