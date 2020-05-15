@@ -20,7 +20,6 @@ public class CryptoManager implements ICryptoManager
     private Method cryptoMethod;
     private Method crackMethod;
 
-    private IKeyReader keyReader;
     private ILogger logger = null;
 
     public String decrypt(String message, String algorithm, String keyfile)
