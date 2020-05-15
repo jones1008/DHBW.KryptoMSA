@@ -1,5 +1,6 @@
 package gui;
 
+import companyNetwork.ChannelManager;
 import companyNetwork.CompanyNetwork;
 import cryptoManager.CryptoManager;
 import logger.Logger;
@@ -93,21 +94,22 @@ public class GUI extends Application {
 
     private void execute(TextArea command, TextArea output) {
         System.out.println("--- execute ---");
-        CryptoManager manager = new CryptoManager();
+        CryptoManager cryptoManager = new CryptoManager();
+        ChannelManager channelManager = new ChannelManager();
         String resultText = "";
 
         if (command.getText().equals("show algorithm")) {
-            resultText = showAlgorithms(manager);
+            resultText = showAlgorithms(cryptoManager);
         } else if (command.getText().matches("encrypt message \".*\" using .* and keyfile .*")) {
-            resultText = encryptMessage(command.getText(), manager);
+            resultText = encryptMessage(command.getText(), cryptoManager);
         } else if (command.getText().matches("decrypt message \".*\" using .* and keyfile .*")) {
-            resultText = decryptMessage(command.getText(), manager);
+            resultText = decryptMessage(command.getText(), cryptoManager);
         } else if (command.getText().matches("crack encrypted message \".*\" using .*")) {
-            resultText = crackMessage(command.getText(), manager);
+            resultText = crackMessage(command.getText(), cryptoManager);
         } else if (command.getText().matches("register participant .* with type .*")) {
             resultText = registerParticipant(command.getText());
         } else if (command.getText().matches("create channel .* from .* to .*")) {
-            resultText = createChannel(command.getText());
+            resultText = createChannel(command.getText(), channelManager);
         } else if (command.getText().equals("show channel")) {
             resultText = showChannel();
         } else if (command.getText().matches("drop channel .*")) {
@@ -172,7 +174,7 @@ public class GUI extends Application {
         return manager.crack(message, algorithm);
     }
 
-    private String registerParticipant(String command) {
+    private String registerParticipant(String command) { // command: register participant [name] with type [type]
         String[] splitted = command.split(" "); // 0: register, 1: participant, 2: [name], 3: with, 4: type, 5: [type]
         String name = splitted[2];
         String type = splitted[5];
@@ -183,8 +185,15 @@ public class GUI extends Application {
         return CompanyNetwork.instance.registerParticipant(name, type);
     }
 
-    private String createChannel(String command) {
-        return "";
+    private String createChannel(String command, ChannelManager manager) { // command: create channel .* from .* to .*
+        String[] splitted = command.split(" ");
+        String channelName = splitted[2];
+        String participant01 = splitted[4];
+        String participant02 = splitted[6];
+
+        initTestBranches();
+
+        return manager.create(channelName, participant01, participant02);
     }
 
     private String showChannel() {
@@ -224,5 +233,10 @@ public class GUI extends Application {
 
     private void shutdownDB() {
         HSQLDB.instance.shutdown();
+    }
+
+    private void initTestBranches() {
+        System.out.println(CompanyNetwork.instance.registerParticipant("branch_hkg", "normal"));
+        System.out.println(CompanyNetwork.instance.registerParticipant("branch_wuh", "normal"));
     }
 }

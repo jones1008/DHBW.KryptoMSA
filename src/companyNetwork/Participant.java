@@ -1,7 +1,6 @@
 package companyNetwork;
 
 public class Participant extends Subscriber {
-    private String name;
     private ParticipantType type;
 
     public Participant(int id) {
@@ -10,19 +9,13 @@ public class Participant extends Subscriber {
 
     public Participant(int id, String name, ParticipantType type)
     {
-        super(id);
-        this.name = name;
+        super(id, name);
         this.type = type;
     }
 
     public boolean equals() {
         // TODO: implementieren
         return false;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public ParticipantType getType()

@@ -189,6 +189,24 @@ public enum HSQLDB {
         String sql = "SELECT * FROM participants WHERE name='" + name + "'";
         return hasResult(sql);
     }
+    public int getParticipantId(String name) {
+        int id = 0;
+
+        try
+        {
+            String sqlStatement = "SELECT id FROM participants WHERE name='" + name + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sqlStatement);
+
+            while (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        } catch (SQLException sqle) {
+            System.out.println(sqle.getMessage());
+        }
+
+        return id;
+    }
 
     // algorithm
     public void createTableAlgorithms() {
@@ -272,11 +290,10 @@ public enum HSQLDB {
         update(sqlStringBuilder03.toString());
     }
     public void insertDataTableChannel(String name, Subscriber participant01, Subscriber participant02) {
-        int nextID = getNextID("channel") + 1;
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO channel (").append("name").append(",").append("participant_01").append(",").append("participant_02").append(")");
         sqlStringBuilder.append(" VALUES ");
-        sqlStringBuilder.append("(").append(name).append(",").append("'").append(participant01.getId()).append("'").append(",").append("'").append(participant02.getId()).append("'");
+        sqlStringBuilder.append("('").append(name).append("',").append("'").append(participant01.getId()).append("'").append(",").append("'").append(participant02.getId()).append("'");
         sqlStringBuilder.append(")");
         System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
         update(sqlStringBuilder.toString());
@@ -290,8 +307,8 @@ public enum HSQLDB {
         return hasResult(sql);
     }
     public boolean channelExists(Subscriber participant01, Subscriber participant02) {
-        String sql = "SELECT * FROM channel WHERE participant01='"+participant01.getId()+"' " +
-                     "AND participant02='"+participant02.getId()+"'";
+        String sql = "SELECT * FROM channel WHERE participant_01 IN ("+participant01.getId()+", "+participant02.getId()+")" +
+                     "AND participant_02 IN ("+participant01.getId()+", "+participant02.getId()+")";
         return hasResult(sql);
     }
 
