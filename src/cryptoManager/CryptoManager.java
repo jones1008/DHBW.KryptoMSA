@@ -20,18 +20,8 @@ public class CryptoManager implements ICryptoManager
     private Method cryptoMethod;
     private Method crackMethod;
 
-    private boolean debugActive;
-
     private IKeyReader keyReader;
     private ILogger logger = null;
-
-    public CryptoManager() {
-        this.debugActive = false;
-    }
-
-    public CryptoManager(boolean debugActive) {
-        this.debugActive = debugActive;
-    }
 
     public String decrypt(String message, String algorithm, String keyfile)
     {
@@ -40,9 +30,15 @@ public class CryptoManager implements ICryptoManager
             return null;
         }
 
+        log("Creating decryption method at runtime from component");
         createCryptoMethod("decrypt");
 
-        return crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
+        log("Detected decryption algorithm '" + Configuration.instance.algorithm + "'");
+        String decryptedMessage = crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
+        if (decryptedMessage != "") {
+            log("Successfully decrypted message '" + message + "' to '" + decryptedMessage + "'");
+        }
+        return decryptedMessage;
     }
 
     public String encrypt(String message, String algorithm, String keyfile)
@@ -51,11 +47,15 @@ public class CryptoManager implements ICryptoManager
         {
             return null;
         }
-        log("creating encryption method at runtime from component");
+        log("Creating encryption method at runtime from component");
         createCryptoMethod("encrypt");
 
-        log("detected encryption method '" + Configuration.instance.algorithm + "'");
-        return crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
+        log("Detected encryption algorithm '" + Configuration.instance.algorithm + "'");
+        String encryptedMessage = crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
+        if (encryptedMessage != "") {
+            log("Successfully encrypted message '" + message + "' to '" + encryptedMessage + "'");
+        }
+        return encryptedMessage;
     }
 
     public String[] showAlgorithms()

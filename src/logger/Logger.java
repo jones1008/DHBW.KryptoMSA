@@ -18,7 +18,6 @@ public class Logger implements ILogger{
         // create file if it doesn't exist yet
         File f = new File(fileName);
         try {
-            // TODO: funktioniert noch nicht ganz...
             f.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
