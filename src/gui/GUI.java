@@ -93,7 +93,7 @@ public class GUI extends Application {
 
     private void execute(TextArea command, TextArea output) {
         System.out.println("--- execute ---");
-        CryptoManager manager = new CryptoManager(this.debugActive);
+        CryptoManager manager = new CryptoManager();
         String resultText = "";
 
         if (command.getText().equals("show algorithm")) {

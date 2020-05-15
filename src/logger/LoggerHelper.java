@@ -21,7 +21,9 @@ public abstract class LoggerHelper {
                 }
             }
             try {
-                return Files.readString(Paths.get(latestLogfile.getPath()), StandardCharsets.UTF_8);
+                String path = latestLogfile.getPath();
+                byte[] encoded = Files.readAllBytes(Paths.get(path));
+                return "newest Logfile: " + path + "\n\n" + new String(encoded, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
