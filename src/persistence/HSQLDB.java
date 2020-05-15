@@ -1,9 +1,11 @@
 package persistence;
 
+import companyNetwork.*;
 import configuration.Configuration;
-import companyNetwork.Subscriber;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum HSQLDB {
     instance;
@@ -22,21 +24,24 @@ public enum HSQLDB {
             System.out.println(e.getMessage());
         }
     }
-    private synchronized void update(String sqlStatement) {
+    private synchronized boolean update(String sqlStatement) {
         try {
             Statement statement = connection.createStatement();
             int result = statement.executeUpdate(sqlStatement);
 
             if (result == -1) {
                 System.out.println("error executing " + sqlStatement);
+                return false;
             }
 
             statement.close();
+            return true;
         } catch (SQLException sqle) {
             System.out.println(sqle.getMessage());
         }
+        return false;
     }
-    private int getNextID(String table) {
+    public int getNextID(String table) {
         int nextID = 0;
 
         try {
@@ -47,11 +52,12 @@ public enum HSQLDB {
             while (resultSet.next()) {
                 nextID = resultSet.getInt(1);
             }
+            statement.close();
         } catch (SQLException sqle) {
             System.out.println(sqle.getMessage());
         }
 
-        return nextID;
+        return ++nextID;
     }
     private boolean hasResult(String sql) {
         try {
@@ -109,7 +115,7 @@ public enum HSQLDB {
             System.out.println("Type with name " + name + " already exists");
             return;
         }
-        int nextID = getNextID("types") + 1;
+        int nextID = getNextID("types");
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO types (").append("id").append(",").append("name").append(")");
         sqlStringBuilder.append(" VALUES ");
@@ -123,7 +129,7 @@ public enum HSQLDB {
 
         try
         {
-            String sqlStatement = "SELECT id FROM types WHERE name='" + type + "'";
+            String sqlStatement = "SELECT id FROM types WHERE name='" + type.toLowerCase() + "'";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sqlStatement);
 
@@ -135,6 +141,20 @@ public enum HSQLDB {
         }
 
         return id;
+    }
+
+    public String getTypeName(int id) {
+        try {
+            String sqlStatement = "SELECT name FROM types WHERE id=" + id;
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sqlStatement);
+            while (rs.next()) {
+                return rs.getString("name").toUpperCase();
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return null;
     }
 
     // participants
@@ -174,15 +194,19 @@ public enum HSQLDB {
 
         update(sqlStringBuilder03.toString());
     }
-    public int insertDataTableParticipants(String name, int typeID) {
-        int nextID = getNextID("participants") + 1;
-        StringBuilder sqlStringBuilder = new StringBuilder();
-        sqlStringBuilder.append("INSERT INTO participants (").append("id").append(",").append("name").append(",").append("type_id").append(")");
-        sqlStringBuilder.append(" VALUES ");
-        sqlStringBuilder.append("(").append(nextID).append(",").append("'").append(name).append("'").append(",").append(typeID);
-        sqlStringBuilder.append(")");
-        System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
-        update(sqlStringBuilder.toString());
+    public int insertDataTableParticipants(String name, int typeId) {
+        // TODO: nextID mit ID von participant ersetzen?
+        int nextID = getNextID("participants");
+        String sql = "INSERT INTO participants (id, name, type_id) " +
+                     "VALUES (" + nextID + ", '" + name + "', " + typeId + ")";
+//        StringBuilder sqlStringBuilder = new StringBuilder();
+//        sqlStringBuilder.append("INSERT INTO participants (").append("id").append(",").append("name").append(",").append("type_id").append(")");
+//        sqlStringBuilder.append(" VALUES ");
+//        sqlStringBuilder.append("(").append(nextID).append(",").append("'").append(name).append("'").append(",").append(typeID);
+//        sqlStringBuilder.append(")");
+//        System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
+//        update(sqlStringBuilder.toString());
+        update(sql);
         return nextID;
     }
     public boolean participantExists(String name) {
@@ -206,6 +230,20 @@ public enum HSQLDB {
         }
 
         return id;
+    }
+    public Participant getParticipantById(int id) {
+        String sql = "SELECT * FROM participants WHERE id=" + id;
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                return new Participant(rs.getInt("id"), rs.getString("name"), ParticipantType.valueOf(getTypeName(rs.getInt("type_id"))));
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return null;
     }
 
     // algorithm
@@ -231,7 +269,7 @@ public enum HSQLDB {
             System.out.println("Algorithm with name " + name + " already exists");
             return;
         }
-        int nextID = getNextID("algorithms") + 1;
+        int nextID = getNextID("algorithms");
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO algorithms (").append("id").append(",").append("name").append(")");
         sqlStringBuilder.append(" VALUES ");
@@ -289,18 +327,17 @@ public enum HSQLDB {
         System.out.println("sqlStringBuilder : " + sqlStringBuilder03.toString());
         update(sqlStringBuilder03.toString());
     }
-    public void insertDataTableChannel(String name, Subscriber participant01, Subscriber participant02) {
-        StringBuilder sqlStringBuilder = new StringBuilder();
-        sqlStringBuilder.append("INSERT INTO channel (").append("name").append(",").append("participant_01").append(",").append("participant_02").append(")");
-        sqlStringBuilder.append(" VALUES ");
-        sqlStringBuilder.append("('").append(name).append("',").append("'").append(participant01.getId()).append("'").append(",").append("'").append(participant02.getId()).append("'");
-        sqlStringBuilder.append(")");
-        System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
-        update(sqlStringBuilder.toString());
-    }
-    public void deleteChannel(String name) {
-        String sql = "DELETE FROM channel WHERE name='" + name + "'";
+    public void insertDataTableChannel(IChannel channel) {
+        String sql = "INSERT INTO channel (name, participant_01, participant_02) " +
+                     "VALUES ('" + channel.getName() + "', " + channel.getParticipant01().getId() + ", " + channel.getParticipant02().getId() + ")";
         update(sql);
+    }
+    public String deleteChannel(String name) {
+        String sql = "DELETE FROM channel WHERE name='" + name + "'";
+        if (update(sql)) {
+            return "channel " + name + " deleted";
+        }
+        return "Error deleting channel " + name;
     }
     public boolean channelExists(String name) {
         String sql = "SELECT * FROM channel WHERE name='"+name+"'";
@@ -310,6 +347,25 @@ public enum HSQLDB {
         String sql = "SELECT * FROM channel WHERE participant_01 IN ("+participant01.getId()+", "+participant02.getId()+")" +
                      "AND participant_02 IN ("+participant01.getId()+", "+participant02.getId()+")";
         return hasResult(sql);
+    }
+    public List<Channel> getAllChannels() {
+        List<Channel> channels = new ArrayList<Channel>();
+        try {
+            String sql = "SELECT * FROM channel";
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                // TODO: zuerst schauen, ob schon ein partcipant in der particpantMap ist. Wenn ja, dann diesen mitgeben.
+                // Wenn nicht: Participant erstellen und der participantMap hinzufügen -> createParticipant
+                Participant participant01 = getParticipantById(rs.getInt("participant_01"));
+                Participant participant02 = getParticipantById(rs.getInt("participant_02"));
+                channels.add(new Channel(rs.getString("name"), participant01, participant02));
+            }
+            return channels;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // messages

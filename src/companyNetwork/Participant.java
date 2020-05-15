@@ -1,10 +1,13 @@
 package companyNetwork;
 
+import persistence.HSQLDB;
+
 public class Participant extends Subscriber {
     private ParticipantType type;
 
-    public Participant(int id) {
-        super(id);
+    public Participant(String name, ParticipantType type) {
+        super(HSQLDB.instance.getNextID("participants"), name);
+        this.type = type;
     }
 
     public Participant(int id, String name, ParticipantType type)
@@ -18,9 +21,9 @@ public class Participant extends Subscriber {
         return false;
     }
 
-    public ParticipantType getType()
+    public String getType()
     {
-        return type;
+        return type.toString();
     }
 
 //    @Subscribe

@@ -19,10 +19,18 @@ public enum CompanyNetwork {
         this.channelMap.put(channel.getName(), channel);
     }
 
-    public Subscriber getSubscriberForName(String name) {
+    public Participant getParticipantFromMapByName(String name) {
         for (Subscriber subscriber : participantMap.values()) {
             if (subscriber.getName().equals(name)) {
-                return subscriber;
+                return (Participant) subscriber;
+            }
+        }
+        return null;
+    }
+    public Participant getParticipantFromMapById(int id) {
+        for (Subscriber subscriber : participantMap.values()) {
+            if (subscriber.getId() == id) {
+                return (Participant) subscriber;
             }
         }
         return null;
@@ -46,7 +54,7 @@ public enum CompanyNetwork {
 
     public String registerParticipant(String name, String type) {
         if (HSQLDB.instance.participantExists(name)) {
-            if (getSubscriberForName(name) == null) {
+            if (getParticipantFromMapByName(name) == null) {
                 int participantID = HSQLDB.instance.getParticipantId(name);
                 createParticipant(name, type, participantID);
             }
@@ -65,10 +73,10 @@ public enum CompanyNetwork {
         return "participant " + participant.getName() + " with type " + participant.getType() + " registered and postbox_" + participant.getName() + " created";
     }
 
-    private Participant createParticipant(String name, String type, int participantID) {
+    public Participant createParticipant(String name, String type, int participantID) {
         Participant participant;
 
-        switch (type) {
+        switch (type.toLowerCase()) {
             case "normal":
                 participant = new Participant(participantID, name, ParticipantType.NORMAL);
                 break;
@@ -82,4 +90,8 @@ public enum CompanyNetwork {
         addSubscriberToMap(participant);
         return participant;
     }
+
+//    public void initMaps() {
+//        HSQLDB.instance.getAllParticipants()
+//    }
 }

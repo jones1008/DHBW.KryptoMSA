@@ -1,16 +1,18 @@
 package application;
 
+import companyNetwork.Channel;
+import companyNetwork.Participant;
+import companyNetwork.ParticipantType;
 import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
-
-import java.util.Scanner;
 
 public class Application {
     public static void main(String... args)
     {
-        cryptoManagerDemo();
-        System.out.println();
-        crackerDemo();
+        fillDBWithChannels();
+//        cryptoManagerDemo();
+//        System.out.println();
+//        crackerDemo();
     }
 
     private static void hsqldbDemo() {
@@ -33,12 +35,12 @@ public class Application {
         HSQLDB.instance.insertDataTableAlgorithms("rsa");
         HSQLDB.instance.insertDataTableAlgorithms("shift");
 
-        HSQLDB.instance.insertDataTableParticipants("branch_hkg", 1);
-        HSQLDB.instance.insertDataTableParticipants("branch_cpt", 1);
-        HSQLDB.instance.insertDataTableParticipants("branch_sfo", 1);
-        HSQLDB.instance.insertDataTableParticipants("branch_syd", 1);
-        HSQLDB.instance.insertDataTableParticipants("branch_wuh", 1);
-        HSQLDB.instance.insertDataTableParticipants("msa", 2);
+//        HSQLDB.instance.insertDataTableParticipants("branch_hkg", 1);
+//        HSQLDB.instance.insertDataTableParticipants("branch_cpt", 1);
+//        HSQLDB.instance.insertDataTableParticipants("branch_sfo", 1);
+//        HSQLDB.instance.insertDataTableParticipants("branch_syd", 1);
+//        HSQLDB.instance.insertDataTableParticipants("branch_wuh", 1);
+//        HSQLDB.instance.insertDataTableParticipants("msa", 2);
 
         HSQLDB.instance.shutdown();
     }
@@ -104,5 +106,18 @@ public class Application {
         System.out.println("message: " + message);
         System.out.println("cracked: ");
         System.out.println(cracked);
+    }
+
+    private static void fillDBWithChannels() {
+        HSQLDB.instance.setupConnection();
+        Participant participant01 = new Participant(1, "hkg", ParticipantType.NORMAL);
+        Participant participant02 = new Participant(2, "wuh", ParticipantType.NORMAL);
+        Channel channel1 = new Channel("hkg_wuh_test01", participant01, participant02);
+        Channel channel2 = new Channel("wuh_hkg_test02", participant02, participant01);
+        HSQLDB.instance.insertDataTableParticipants(participant01.getName(), HSQLDB.instance.getTypeID(participant01.getType()));
+        HSQLDB.instance.insertDataTableParticipants(participant02.getName(), HSQLDB.instance.getTypeID(participant02.getType()));
+        HSQLDB.instance.insertDataTableChannel(channel1);
+        HSQLDB.instance.insertDataTableChannel(channel2);
+        HSQLDB.instance.shutdown();
     }
 }

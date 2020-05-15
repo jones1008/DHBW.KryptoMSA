@@ -17,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import logger.LoggerHelper;
 import persistence.HSQLDB;
 
 public class GUI extends Application {
@@ -84,7 +83,7 @@ public class GUI extends Application {
                 break;
             case F8:
                 System.out.println("Show Logfile");
-                output.setText(LoggerHelper.getContentOfLatestLogfile());
+                output.setText(Logger.getContentOfLatestLogfile());
                 break;
             case F5:
                 execute(command, output);
@@ -95,34 +94,38 @@ public class GUI extends Application {
     private void execute(TextArea command, TextArea output) {
         System.out.println("--- execute ---");
         CryptoManager cryptoManager = new CryptoManager();
-        ChannelManager channelManager = new ChannelManager();
+//        ChannelManager channelManager = new ChannelManager();
         String resultText = "";
 
-        if (command.getText().equals("show algorithm")) {
+        if (getCommand(command).equals("show algorithm")) {
             resultText = showAlgorithms(cryptoManager);
-        } else if (command.getText().matches("encrypt message \".*\" using .* and keyfile .*")) {
-            resultText = encryptMessage(command.getText(), cryptoManager);
-        } else if (command.getText().matches("decrypt message \".*\" using .* and keyfile .*")) {
-            resultText = decryptMessage(command.getText(), cryptoManager);
-        } else if (command.getText().matches("crack encrypted message \".*\" using .*")) {
-            resultText = crackMessage(command.getText(), cryptoManager);
-        } else if (command.getText().matches("register participant .* with type .*")) {
-            resultText = registerParticipant(command.getText());
-        } else if (command.getText().matches("create channel .* from .* to .*")) {
-            resultText = createChannel(command.getText(), channelManager);
-        } else if (command.getText().equals("show channel")) {
+        } else if (getCommand(command).matches("encrypt message \".*\" using .* and keyfile .*")) {
+            resultText = encryptMessage(getCommand(command), cryptoManager);
+        } else if (getCommand(command).matches("decrypt message \".*\" using .* and keyfile .*")) {
+            resultText = decryptMessage(getCommand(command), cryptoManager);
+        } else if (getCommand(command).matches("crack encrypted message \".*\" using .*")) {
+            resultText = crackMessage(getCommand(command), cryptoManager);
+        } else if (getCommand(command).matches("register participant .* with type .*")) {
+            resultText = registerParticipant(getCommand(command));
+        } else if (getCommand(command).matches("create channel .* from .* to .*")) {
+            resultText = createChannel(getCommand(command));
+        } else if (getCommand(command).equals("show channel")) {
             resultText = showChannel();
-        } else if (command.getText().matches("drop channel .*")) {
-            resultText = dropChannel(command.getText());
-        } else if (command.getText().matches("intrude channel .* by .*")) {
-            resultText = intrudeChannel(command.getText());
-        } else if (command.getText().matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
-            resultText = sendMessage(command.getText());
+        } else if (getCommand(command).matches("drop channel .*")) {
+            resultText = dropChannel(getCommand(command));
+        } else if (getCommand(command).matches("intrude channel .* by .*")) {
+            resultText = intrudeChannel(getCommand(command));
+        } else if (getCommand(command).matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
+            resultText = sendMessage(getCommand(command));
         } else {
             resultText = "Invalid Input";
         }
 
         output.setText(resultText);
+    }
+
+    private String getCommand(TextArea command) {
+        return command.getText().trim();
     }
 
     private String showAlgorithms(CryptoManager manager) {
@@ -185,7 +188,7 @@ public class GUI extends Application {
         return CompanyNetwork.instance.registerParticipant(name, type);
     }
 
-    private String createChannel(String command, ChannelManager manager) { // command: create channel .* from .* to .*
+    private String createChannel(String command) { // command: create channel .* from .* to .*
         String[] splitted = command.split(" ");
         String channelName = splitted[2];
         String participant01 = splitted[4];
@@ -193,15 +196,16 @@ public class GUI extends Application {
 
         initTestBranches();
 
-        return manager.create(channelName, participant01, participant02);
+        return ChannelManager.instance.create(channelName, participant01, participant02);
     }
 
     private String showChannel() {
-        return "";
+        return ChannelManager.instance.showAllChannels();
     }
 
     private String dropChannel(String command) {
-        return "";
+        String[] splitted = command.split(" "); // [0]: crack encrypted message; [1]: [message]; [2]: using [algorithm]
+        return ChannelManager.instance.dropChannel(splitted[2]);
     }
 
     private String intrudeChannel(String command) {
