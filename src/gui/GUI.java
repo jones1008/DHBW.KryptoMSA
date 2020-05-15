@@ -1,5 +1,6 @@
 package gui;
 
+import companyNetwork.CompanyNetwork;
 import cryptoManager.CryptoManager;
 import logger.Logger;
 
@@ -16,12 +17,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import logger.LoggerHelper;
+import persistence.HSQLDB;
 
 public class GUI extends Application {
     private boolean debugActive = false;
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("MSA | Mosbach Security Agency");
+        setupDB();
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(15, 12, 15, 12));
@@ -47,6 +50,7 @@ public class GUI extends Application {
 
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent actionEvent) {
+                shutdownDB();
                 System.exit(0);
             }
         });
@@ -169,7 +173,14 @@ public class GUI extends Application {
     }
 
     private String registerParticipant(String command) {
-        return "";
+        String[] splitted = command.split(" "); // 0: register, 1: participant, 2: [name], 3: with, 4: type, 5: [type]
+        String name = splitted[2];
+        String type = splitted[5];
+        if (!type.equals("normal") && !type.equals("intruder")) {
+            return "Invalid type";
+        }
+
+        return CompanyNetwork.instance.registerParticipant(name, type);
     }
 
     private String createChannel(String command) {
@@ -190,5 +201,28 @@ public class GUI extends Application {
 
     private String sendMessage(String command) {
         return "";
+    }
+
+    private void setupDB() {
+        HSQLDB.instance.setupConnection();
+
+        HSQLDB.instance.dropTableParticipants();
+        HSQLDB.instance.dropTableTypes();
+
+        HSQLDB.instance.createTableTypes();
+        HSQLDB.instance.createTableAlgorithms();
+        HSQLDB.instance.createTableParticipants();
+        HSQLDB.instance.createTableChannel();
+        HSQLDB.instance.createTableMessages();
+
+        HSQLDB.instance.insertDataTableTypes("normal");
+        HSQLDB.instance.insertDataTableTypes("intruder");
+
+        HSQLDB.instance.insertDataTableAlgorithms("rsa");
+        HSQLDB.instance.insertDataTableAlgorithms("shift");
+    }
+
+    private void shutdownDB() {
+        HSQLDB.instance.shutdown();
     }
 }

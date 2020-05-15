@@ -3,7 +3,7 @@ package companyNetwork;
 import com.google.common.eventbus.EventBus;
 
 public class Channel implements IChannel {
-    private int id;
+    private String id;
     private EventBus eventBus;
     private Subscriber participant01;
     private Subscriber participant02;
@@ -12,5 +12,10 @@ public class Channel implements IChannel {
 
     public void setIntruder(Subscriber intruder) {
         this.intruder = intruder;
+    }
+
+    public String getId()
+    {
+        return id;
     }
 }

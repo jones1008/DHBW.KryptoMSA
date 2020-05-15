@@ -8,9 +8,26 @@ public class Participant extends Subscriber {
         super(id);
     }
 
+    public Participant(int id, String name, ParticipantType type)
+    {
+        super(id);
+        this.name = name;
+        this.type = type;
+    }
+
     public boolean equals() {
         // TODO: implementieren
         return false;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public ParticipantType getType()
+    {
+        return type;
     }
 
 //    @Subscribe

@@ -105,6 +105,10 @@ public enum HSQLDB {
         update(sqlStringBuilder02.toString());
     }
     public void insertDataTableTypes(String name) {
+        if (getTypeID(name) != 0) {
+            System.out.println("Type with name " + name + " already exists");
+            return;
+        }
         int nextID = getNextID("types") + 1;
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO types (").append("id").append(",").append("name").append(")");
@@ -113,6 +117,24 @@ public enum HSQLDB {
         sqlStringBuilder.append(")");
         System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
         update(sqlStringBuilder.toString());
+    }
+    public int getTypeID(String type) {
+        int id = 0;
+
+        try
+        {
+            String sqlStatement = "SELECT id FROM types WHERE name='" + type + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sqlStatement);
+
+            while (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        } catch (SQLException sqle) {
+            System.out.println(sqle.getMessage());
+        }
+
+        return id;
     }
 
     // participants
@@ -126,7 +148,7 @@ public enum HSQLDB {
         update(sqlStringBuilder.toString());
     }
     public void createTableParticipants() {
-        System.out.println("--- createTableTypes");
+        System.out.println("--- createTableParticipants");
 
         StringBuilder sqlStringBuilder01 = new StringBuilder();
         sqlStringBuilder01.append("CREATE TABLE participants ( ");
@@ -152,7 +174,7 @@ public enum HSQLDB {
 
         update(sqlStringBuilder03.toString());
     }
-    public void insertDataTableParticipants(String name, int typeID) {
+    public int insertDataTableParticipants(String name, int typeID) {
         int nextID = getNextID("participants") + 1;
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO participants (").append("id").append(",").append("name").append(",").append("type_id").append(")");
@@ -161,6 +183,7 @@ public enum HSQLDB {
         sqlStringBuilder.append(")");
         System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
         update(sqlStringBuilder.toString());
+        return nextID;
     }
     public boolean participantExists(String name) {
         String sql = "SELECT * FROM participants WHERE name='" + name + "'";
@@ -186,6 +209,10 @@ public enum HSQLDB {
         update(sqlStringBuilder02.toString());
     }
     public void insertDataTableAlgorithms(String name) {
+        if (getAlgorithmID(name) != 0) {
+            System.out.println("Algorithm with name " + name + " already exists");
+            return;
+        }
         int nextID = getNextID("algorithms") + 1;
         StringBuilder sqlStringBuilder = new StringBuilder();
         sqlStringBuilder.append("INSERT INTO algorithms (").append("id").append(",").append("name").append(")");
@@ -194,6 +221,24 @@ public enum HSQLDB {
         sqlStringBuilder.append(")");
         System.out.println("sqlStringBuilder : " + sqlStringBuilder.toString());
         update(sqlStringBuilder.toString());
+    }
+    public int getAlgorithmID(String algorithm) {
+        int id = 0;
+
+        try
+        {
+            String sqlStatement = "SELECT id FROM algorithms WHERE name='" + algorithm + "'";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sqlStatement);
+
+            while (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        } catch (SQLException sqle) {
+            System.out.println(sqle.getMessage());
+        }
+
+        return id;
     }
 
     // channel
@@ -297,7 +342,7 @@ public enum HSQLDB {
     // postbox
     public void createTablePostbox(String participantName) {
         System.out.println("--- createTablePostbox_"+participantName);
-        String tableName = "participant_" + participantName;
+        String tableName = "postbox_" + participantName;
 
         StringBuilder sqlStringBuilder01 = new StringBuilder();
         sqlStringBuilder01.append("CREATE TABLE ").append(tableName).append(" (");
@@ -312,7 +357,7 @@ public enum HSQLDB {
 
         StringBuilder sqlStringBuilder02 = new StringBuilder();
         sqlStringBuilder02.append("ALTER TABLE ").append(tableName);
-        sqlStringBuilder02.append(" messages ADD CONSTRAINT fk").append(tableName).append("01 ");
+        sqlStringBuilder02.append(" ADD CONSTRAINT fk").append(tableName).append("01 ");
         sqlStringBuilder02.append("FOREIGN KEY (participant_from_id) ");
         sqlStringBuilder02.append("REFERENCES participants (id) ");
         sqlStringBuilder02.append("ON DELETE CASCADE");
