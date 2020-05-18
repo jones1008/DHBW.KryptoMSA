@@ -48,17 +48,7 @@ public enum ChannelManager implements IChannelManager {
             return "No channels found.";
         }
     }
-    public String deleteChannel(String name) {
-        Map<String, IChannel> channelMap = CompanyNetwork.instance.getChannelMap();
-        if (channelMap.get(name) != null) {
-            if (HSQLDB.instance.deleteChannel(name)) {
-                channelMap.remove(name);
-                return "channel " + name + " deleted";
-            }
-            return "Error deleting channel " + name;
-        }
-        return "unknown channel " + name;
-    }
+
 
     public void intrudeChannel(String name, String participant) {
 

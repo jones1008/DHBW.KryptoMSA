@@ -207,7 +207,7 @@ public class GUI extends Application {
 
     private String deleteChannel(String command) {
         String[] splitted = command.split(" "); // [0]: crack encrypted message; [1]: [message]; [2]: using [algorithm]
-        return ChannelManager.instance.deleteChannel(splitted[2]);
+        return CompanyNetwork.instance.deleteChannel(splitted[2]);
     }
 
     private String intrudeChannel(String command) {

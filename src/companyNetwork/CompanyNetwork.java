@@ -82,6 +82,16 @@ public enum CompanyNetwork {
     public Map<String, IChannel> getChannelMap() {
         return channelMap;
     }
+    public String deleteChannel(String name) {
+        if (isChannelRegistered(name)) {
+            if (HSQLDB.instance.deleteChannel(name)) {
+                channelMap.remove(name);
+                return "channel " + name + " deleted";
+            }
+            return "Error deleting channel " + name;
+        }
+        return "unknown channel " + name;
+    }
 
     // general
     public void initMaps() {
