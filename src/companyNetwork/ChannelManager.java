@@ -18,13 +18,11 @@ public enum ChannelManager implements IChannelManager {
             return participant01 + " or " + participant02 + " do not exists";
         }
 
-        if (HSQLDB.instance.channelExists(name)) {
-            addChannelToMap(participant1, participant2, name);
+        if (CompanyNetwork.instance.isChannelRegistered(name)) {
             return "channel " + name + " already exists";
         }
 
-        if (HSQLDB.instance.channelExists(participant1, participant2)) {
-            addChannelToMap(participant1, participant2, name);
+        if (CompanyNetwork.instance.isChannelRegistered(participant1, participant2)) {
             return "communication channel between " + participant01 + " and " + participant02 + " already exists";
         }
 
@@ -62,13 +60,5 @@ public enum ChannelManager implements IChannelManager {
 
     public void sendMessage(String message, String participant01, String participant02, String algorithm, String keyfile) {
 
-    }
-
-    private void addChannelToMap(Subscriber participant1, Subscriber participant2, String name) {
-        if (!CompanyNetwork.instance.isChannelRegistered(name, participant1, participant2))
-        {
-            IChannel channel = new Channel(name, participant1, participant2);
-            CompanyNetwork.instance.addChannelToMap(channel);
-        }
     }
 }

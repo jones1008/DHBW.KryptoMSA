@@ -27,7 +27,7 @@ public enum CompanyNetwork {
         }
         return null;
     }
-    public Participant createParticipant(String name, String type, int participantID) {
+    private Participant createParticipant(String name, String type, int participantID) {
         Participant participant;
 
         switch (type.toLowerCase()) {
@@ -45,11 +45,7 @@ public enum CompanyNetwork {
         return participant;
     }
     public String registerParticipant(String name, String type) {
-        if (HSQLDB.instance.participantExists(name)) {
-            if (getParticipantFromMapByName(name) == null) {
-                int participantID = HSQLDB.instance.getParticipantId(name);
-                createParticipant(name, type, participantID);
-            }
+        if (getParticipantFromMapByName(name) != null) {
             return "participant " + name + " already exists, using existing postbox_" + name;
         }
 
@@ -69,11 +65,13 @@ public enum CompanyNetwork {
     public void addChannelToMap(IChannel channel) {
         this.channelMap.put(channel.getName(), channel);
     }
-    public boolean isChannelRegistered(String name, Subscriber participant1, Subscriber participant2) {
+    public boolean isChannelRegistered(String name) {
         if (channelMap.containsKey(name)) {
             return true;
         }
-
+        return false;
+    }
+    public boolean isChannelRegistered(Subscriber participant1, Subscriber participant2) {
         for (IChannel channel : channelMap.values()) {
             if ((channel.getParticipant01().equals(participant1)
                     || channel.getParticipant01().equals(participant2))
