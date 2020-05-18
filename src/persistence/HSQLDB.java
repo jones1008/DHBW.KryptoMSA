@@ -143,13 +143,13 @@ public enum HSQLDB {
         return id;
     }
 
-    public String getTypeName(int id) {
+    public ParticipantType getParticipantTypeById(int id) {
         try {
             String sqlStatement = "SELECT name FROM types WHERE id=" + id;
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sqlStatement);
             while (rs.next()) {
-                return rs.getString("name").toUpperCase();
+                return ParticipantType.valueOf(rs.getString("name").toUpperCase());
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -238,8 +238,34 @@ public enum HSQLDB {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
-                return new Participant(rs.getInt("id"), rs.getString("name"), ParticipantType.valueOf(getTypeName(rs.getInt("type_id"))));
+                return getParticipantFromResultSet(rs);
             }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return null;
+    }
+    public List<Participant> getAllParticipants() {
+        List<Participant> participants = new ArrayList<>();
+        String sql = "SELECT * FROM participants";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                participants.add(getParticipantFromResultSet(rs));
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return participants;
+    }
+    public Participant getParticipantFromResultSet(ResultSet rs) {
+        try {
+            return new Participant(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    getParticipantTypeById(rs.getInt("type_id"))
+            );
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
@@ -349,23 +375,24 @@ public enum HSQLDB {
         return hasResult(sql);
     }
     public List<Channel> getAllChannels() {
-        List<Channel> channels = new ArrayList<Channel>();
+        List<Channel> channels = new ArrayList<>();
         try {
             String sql = "SELECT * FROM channel";
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
-                // TODO: zuerst schauen, ob schon ein partcipant in der particpantMap ist. Wenn ja, dann diesen mitgeben.
-                // Wenn nicht: Participant erstellen und der participantMap hinzufügen -> createParticipant
-                Participant participant01 = getParticipantById(rs.getInt("participant_01"));
-                Participant participant02 = getParticipantById(rs.getInt("participant_02"));
-                channels.add(new Channel(rs.getString("name"), participant01, participant02));
+                // get participants from Map if they exist
+                Participant participant01 = CompanyNetwork.instance.getParticipantFromMapById(rs.getInt("participant_01"));
+                if(participant01 == null)  participant01 = getParticipantById(rs.getInt("participant_01"));
+                Participant participant02 = CompanyNetwork.instance.getParticipantFromMapById(rs.getInt("participant_02"));
+                if(participant02 == null)  participant02 = getParticipantById(rs.getInt("participant_02"));
+                Channel channel = new Channel(rs.getString("name"), participant01, participant02);
+                channels.add(channel);
             }
-            return channels;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return channels;
     }
 
     // messages
