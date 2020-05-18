@@ -1,6 +1,7 @@
 package companyNetwork;
 
 import com.google.common.eventbus.EventBus;
+import persistence.HSQLDB;
 
 public class Channel implements IChannel {
     private EventBus eventBus;
@@ -14,8 +15,16 @@ public class Channel implements IChannel {
         this.name = name;
         this.participant01 = participant01;
         this.participant02 = participant02;
-        this.eventBus = new EventBus();
+        this.eventBus = new EventBus(name);
+        eventBus.register(participant01);
+        eventBus.register(participant02);
         // TODO: add participants as listeners
+    }
+
+    public void send(String message, String encryptedMessage, int participantFromID, String algorithm, String keyfile, int participantToID) {
+        int algorithmID = HSQLDB.instance.getAlgorithmID(algorithm);
+        //HSQLDB.instance.insertDataTableMessages(participantFromID, participantToID, message, algorithmID, encryptedMessage, keyfile);
+        eventBus.post(new SendMessageEvent(encryptedMessage, participantFromID, algorithm, keyfile));
     }
 
     public void setIntruder(Subscriber intruder) {

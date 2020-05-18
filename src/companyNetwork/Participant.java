@@ -1,5 +1,7 @@
 package companyNetwork;
 
+import com.google.common.eventbus.Subscribe;
+import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
 public class Participant extends Subscriber {
@@ -33,10 +35,37 @@ public class Participant extends Subscriber {
         return type.toString();
     }
 
-//    @Subscribe
-//    public void receive(FireEvent fireEvent) {
-//        System.out.println("FireBrigade " + id);
-//        System.out.println(fireEvent);
-//        System.out.println();
-//    }
+    public String encrypt (String message, String algorithm, String keyfile) {
+        CryptoManager manager = new CryptoManager();
+        return manager.encrypt(message, algorithm, keyfile);
+    }
+
+    @Subscribe
+    public void receive(SendMessageEvent sendMessageEvent) {
+        if (sendMessageEvent.getParticipantFromID() == id) {
+            return;
+        }
+        System.out.println("Participant: " + name + ", Message: ");
+        System.out.println(sendMessageEvent.getMessage());
+        switch (type) {
+            case NORMAL:
+                receiveAsNormal(sendMessageEvent);
+                break;
+            case INTRUDER:
+                receiveAsIntruder(sendMessageEvent);
+                break;
+        }
+    }
+
+    private void receiveAsNormal(SendMessageEvent sendMessageEvent) {
+        // TODO: decrypt message with cryptoManager
+        // TODO: HSQLDB.insertDataTablePostbox
+    }
+
+    private void receiveAsIntruder(SendMessageEvent sendMessageEvent) {
+        // TODO: insert postbox: unknown
+        // TODO: try to crack
+        // TODO: if successful: update postbox
+        // TODO: if not: output: crack message failed
+    }
 }

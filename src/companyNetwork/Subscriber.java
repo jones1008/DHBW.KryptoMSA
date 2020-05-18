@@ -22,9 +22,4 @@ public abstract class Subscriber {
     public String getName() {
         return name;
     }
-
-    @Subscribe
-    public void receive(String event) {
-        System.out.println("Received " + event);
-    }
 }

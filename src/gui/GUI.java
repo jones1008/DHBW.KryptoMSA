@@ -1,5 +1,6 @@
 package gui;
 
+import companyNetwork.Channel;
 import companyNetwork.ChannelManager;
 import companyNetwork.CompanyNetwork;
 import cryptoManager.CryptoManager;
@@ -212,8 +213,16 @@ public class GUI extends Application {
         return "";
     }
 
-    private String sendMessage(String command) {
-        return "";
+    private String sendMessage(String command) { // command: send message ".*" from .* to .* using .* and keyfile .*
+        String[] splitted = command.split("\"");
+        String message = splitted[1];
+        splitted = splitted[2].trim().split(" "); // 0: from, 1: [from], 2: to, 3: [to], 4: using, 5: [algorithm], 6: and, 7: keyfile, 8: [keyfile]
+        String participant01 = splitted[1];
+        String participant02 = splitted[3];
+        String algorithm = splitted[5];
+        String keyfile = splitted[8];
+
+        return ChannelManager.instance.sendMessage(message, participant01, participant02, algorithm, keyfile);
     }
 
     private void setupDB() {

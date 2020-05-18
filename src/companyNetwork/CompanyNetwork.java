@@ -79,6 +79,17 @@ public enum CompanyNetwork {
         }
         return false;
     }
+    public IChannel getChannel(Subscriber participant1, Subscriber participant2) {
+        for (IChannel channel : channelMap.values()) {
+            if ((channel.getParticipant01().equals(participant1)
+                    || channel.getParticipant01().equals(participant2))
+                    && (channel.getParticipant02().equals(participant1)
+                    || channel.getParticipant02().equals(participant2))) {
+                return channel;
+            }
+        }
+        return null;
+    }
     public Map<String, IChannel> getChannelMap() {
         return channelMap;
     }

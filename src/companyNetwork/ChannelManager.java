@@ -54,7 +54,22 @@ public enum ChannelManager implements IChannelManager {
 
     }
 
-    public void sendMessage(String message, String participant01, String participant02, String algorithm, String keyfile) {
+    public String sendMessage(String message, String participant01, String participant02, String algorithm, String keyfile) {
+        Participant participant1 = CompanyNetwork.instance.getParticipantFromMapByName(participant01);
+        Participant participant2 = CompanyNetwork.instance.getParticipantFromMapByName(participant02);
 
+        if (participant1 == null || participant2 == null) {
+            return participant01 + " or " + participant02 + " do not exists";
+        }
+
+        if (!CompanyNetwork.instance.isChannelRegistered(participant1, participant2)) {
+            return "no valid channel from " + participant01 + " to " + participant02;
+        }
+
+        String encryptedMessage = participant1.encrypt(message, algorithm, keyfile);
+        IChannel channel = CompanyNetwork.instance.getChannel(participant1, participant2);
+        channel.send(message, encryptedMessage, participant1.getId(), algorithm, keyfile, participant2.getId());
+
+        return participant02 + "received new message";
     }
 }
