@@ -1,8 +1,6 @@
 package application;
 
-import companyNetwork.Channel;
-import companyNetwork.Participant;
-import companyNetwork.ParticipantType;
+import companyNetwork.*;
 import cryptoManager.CryptoManager;
 import persistence.HSQLDB;
 
@@ -110,14 +108,13 @@ public class Application {
 
     private static void fillDBWithChannels() {
         HSQLDB.instance.setupConnection();
-        Participant participant01 = new Participant(1, "hkg", ParticipantType.NORMAL);
-        Participant participant02 = new Participant(2, "wuh", ParticipantType.NORMAL);
-        Channel channel1 = new Channel("hkg_wuh_test01", participant01, participant02);
-        Channel channel2 = new Channel("wuh_hkg_test02", participant02, participant01);
-        HSQLDB.instance.insertDataTableParticipants(participant01.getName(), HSQLDB.instance.getTypeID(participant01.getType()));
-        HSQLDB.instance.insertDataTableParticipants(participant02.getName(), HSQLDB.instance.getTypeID(participant02.getType()));
-        HSQLDB.instance.insertDataTableChannel(channel1);
-        HSQLDB.instance.insertDataTableChannel(channel2);
+
+        System.out.println(CompanyNetwork.instance.registerParticipant("hkg", "normal"));
+        System.out.println(CompanyNetwork.instance.registerParticipant("wuh", "normal"));
+
+        System.out.println(ChannelManager.instance.create("hkg_wuh_test01", "hkg", "wuh"));
+        System.out.println(ChannelManager.instance.create("wuh_hkg_test01", "wuh", "hkg"));
+
         HSQLDB.instance.shutdown();
     }
 }

@@ -97,27 +97,28 @@ public class GUI extends Application {
         CryptoManager cryptoManager = new CryptoManager();
 //        ChannelManager channelManager = new ChannelManager();
         String resultText = "";
+        String commandText = getCommand(command);
 
-        if (getCommand(command).equals("show algorithm")) {
+        if (commandText.equals("show algorithm")) {
             resultText = showAlgorithms(cryptoManager);
-        } else if (getCommand(command).matches("encrypt message \".*\" using .* and keyfile .*")) {
-            resultText = encryptMessage(getCommand(command), cryptoManager);
-        } else if (getCommand(command).matches("decrypt message \".*\" using .* and keyfile .*")) {
-            resultText = decryptMessage(getCommand(command), cryptoManager);
-        } else if (getCommand(command).matches("crack encrypted message \".*\" using .*")) {
-            resultText = crackMessage(getCommand(command), cryptoManager);
-        } else if (getCommand(command).matches("register participant .* with type .*")) {
-            resultText = registerParticipant(getCommand(command));
-        } else if (getCommand(command).matches("create channel .* from .* to .*")) {
-            resultText = createChannel(getCommand(command));
-        } else if (getCommand(command).equals("show channel")) {
+        } else if (commandText.matches("encrypt message \".*\" using .* and keyfile .*")) {
+            resultText = encryptMessage(commandText, cryptoManager);
+        } else if (commandText.matches("decrypt message \".*\" using .* and keyfile .*")) {
+            resultText = decryptMessage(commandText, cryptoManager);
+        } else if (commandText.matches("crack encrypted message \".*\" using .*")) {
+            resultText = crackMessage(commandText, cryptoManager);
+        } else if (commandText.matches("register participant .* with type .*")) {
+            resultText = registerParticipant(commandText);
+        } else if (commandText.matches("create channel .* from .* to .*")) {
+            resultText = createChannel(commandText);
+        } else if (commandText.equals("show channel")) {
             resultText = showChannel();
-        } else if (getCommand(command).matches("drop channel .*")) {
-            resultText = deleteChannel(getCommand(command));
-        } else if (getCommand(command).matches("intrude channel .* by .*")) {
-            resultText = intrudeChannel(getCommand(command));
-        } else if (getCommand(command).matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
-            resultText = sendMessage(getCommand(command));
+        } else if (commandText.matches("drop channel .*")) {
+            resultText = deleteChannel(commandText);
+        } else if (commandText.matches("intrude channel .* by .*")) {
+            resultText = intrudeChannel(commandText);
+        } else if (commandText.matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
+            resultText = sendMessage(commandText);
         } else {
             resultText = "Invalid Input";
         }
