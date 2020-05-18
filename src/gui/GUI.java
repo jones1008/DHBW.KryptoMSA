@@ -62,7 +62,13 @@ public class GUI extends Application {
     }
 
     public static void setOutputText(String text) {
-        outputArea.setText(outputArea.getText() + "\n" + text);
+        String outputText = outputArea.getText();
+        if (outputText.equals("")) {
+            outputText = text;
+        } else {
+            outputText += "\n" + text;
+        }
+        outputArea.setText(outputText);
     }
 
     private void keyPressed(KeyCode key, TextArea command, TextArea output) {
@@ -203,7 +209,10 @@ public class GUI extends Application {
     }
 
     private String intrudeChannel(String command) {
-        return "";
+        String[] splitted = command.split(" ");
+        String channelName = splitted[2];
+        String participantName = splitted[4];
+        return ChannelManager.instance.intrudeChannel(channelName, participantName);
     }
 
     private String sendMessage(String command) { // command: send message ".*" from .* to .* using .* and keyfile .*

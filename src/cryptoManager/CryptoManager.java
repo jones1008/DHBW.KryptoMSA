@@ -162,7 +162,7 @@ public class CryptoManager implements ICryptoManager
     }
 
     private String crackShift(String message) {
-        String failedString = "cracking encrypted message \"" + message + "\" failed";
+        String failedString = "Error: cracking encrypted message \"" + message + "\" failed";
         try
         {
             ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -186,7 +186,7 @@ public class CryptoManager implements ICryptoManager
             tasks.add(new RSACrackTask(message, file, crackMethod, port));
         }
 
-        String failedString = "cracking encrypted message \"" + message + "\" failed";
+        String failedString = "Error: cracking encrypted message \"" + message + "\" failed";
         try
         {
             ExecutorService executor = Executors.newSingleThreadExecutor();

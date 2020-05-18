@@ -90,6 +90,9 @@ public enum CompanyNetwork {
         }
         return null;
     }
+    public IChannel getChannel(String name) {
+        return channelMap.get(name);
+    }
     public Map<String, IChannel> getChannelMap() {
         return channelMap;
     }

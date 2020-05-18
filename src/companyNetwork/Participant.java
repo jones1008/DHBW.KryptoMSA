@@ -43,7 +43,7 @@ public class Participant extends Subscriber {
 
     @Subscribe
     public void receive(SendMessageEvent sendMessageEvent) {
-        if (sendMessageEvent.getParticipantFromID() == id) {
+        if (sendMessageEvent.getParticipantFrom().getId() == id) {
             return;
         }
 
@@ -61,13 +61,25 @@ public class Participant extends Subscriber {
         CryptoManager manager = new CryptoManager();
         String decrypted = manager.decrypt(sendMessageEvent.getMessage(), sendMessageEvent.getAlgorithm(), sendMessageEvent.getKeyfile());
         GUI.setOutputText("message: " + decrypted);
-        DBPostbox.instance.insertDataTablePostbox(this.name, sendMessageEvent.getParticipantFromID(), decrypted);
+        DBPostbox.instance.insertDataTablePostbox(this.name, sendMessageEvent.getParticipantFrom().getId(), decrypted);
     }
 
     private void receiveAsIntruder(SendMessageEvent sendMessageEvent) {
-        // TODO: insert postbox: unknown
-        // TODO: try to crack
-        // TODO: if successful: update postbox
-        // TODO: if not: output: crack message failed
+        GUI.setOutputText("trying to crack message...");
+
+        DBPostbox.instance.insertDataTablePostbox(this.name, sendMessageEvent.getParticipantFrom().getId(), "unknown");
+
+        CryptoManager manager = new CryptoManager();
+        String crackedMessage = manager.crack(sendMessageEvent.getMessage(), sendMessageEvent.getAlgorithm());
+
+        String outputText = "";
+        if (!crackedMessage.startsWith("Error:")) {
+            DBPostbox.instance.updateMessageTablePostbox(this.name, crackedMessage);
+            outputText = "intruder " + this.name + " cracked message from participant " + sendMessageEvent.getParticipantFrom().getName() + " | " + crackedMessage;
+        } else {
+            outputText = "intruder " + this.name + " | crack message from participant " + sendMessageEvent.getParticipantFrom().getName() + " failed";
+        }
+
+        GUI.setOutputText(outputText);
     }
 }

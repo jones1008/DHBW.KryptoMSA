@@ -40,7 +40,7 @@ public enum ChannelManager implements IChannelManager {
         if (!channelMap.isEmpty()) {
             String ret = "";
             for (IChannel channel : channelMap.values()) {
-                ret += channel.getName() + " | branch_" + channel.getParticipant01().getName() + " and branch_" + channel.getParticipant02().getName() + "\n";
+                ret += channel.getName() + " | " + channel.getParticipant01().getName() + " and " + channel.getParticipant02().getName() + "\n";
             }
             return ret;
         } else {
@@ -49,8 +49,17 @@ public enum ChannelManager implements IChannelManager {
     }
 
 
-    public void intrudeChannel(String name, String participant) {
-
+    public String intrudeChannel(String name, String participant) {
+        IChannel channel = CompanyNetwork.instance.getChannel(name);
+        if (channel != null) {
+            Participant intruder = CompanyNetwork.instance.getParticipantFromMapByName(participant);
+            if (intruder != null) {
+                channel.setIntruder(intruder);
+                return "Successfully set intruder " + participant + " to channel " + name + ". Now send a message in this channel.";
+            }
+            return "Intruder " + participant + " doesn't exist. Please register first.";
+        }
+        return "No such channel '" + name + "'";
     }
 
     public String sendMessage(String message, String participant01, String participant02, String algorithm, String keyfile) {
@@ -58,7 +67,7 @@ public enum ChannelManager implements IChannelManager {
         Participant participant2 = CompanyNetwork.instance.getParticipantFromMapByName(participant02);
 
         if (participant1 == null || participant2 == null) {
-            return participant01 + " or " + participant02 + " do not exists";
+            return participant01 + " or " + participant02 + " does not exist";
         }
 
         if (!CompanyNetwork.instance.isChannelRegistered(participant1, participant2)) {
@@ -70,7 +79,7 @@ public enum ChannelManager implements IChannelManager {
             return "An error occurred while encrypting";
         }
         IChannel channel = CompanyNetwork.instance.getChannel(participant1, participant2);
-        channel.send(message, encryptedMessage, participant1.getId(), algorithm, keyfile, participant2.getId());
+        channel.send(message, encryptedMessage, participant1, algorithm, keyfile, participant2.getId());
 
         return participant02 + " received new message";
     }

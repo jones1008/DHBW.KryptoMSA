@@ -20,10 +20,10 @@ public class Channel implements IChannel {
         eventBus.register(participant02);
     }
 
-    public void send(String message, String encryptedMessage, int participantFromID, String algorithm, String keyfile, int participantToID) {
+    public void send(String message, String encryptedMessage, Participant participantFrom, String algorithm, String keyfile, int participantToID) {
         int algorithmID = DBAlgorithm.instance.getAlgorithmID(algorithm);
-        DBMessage.instance.insertDataTableMessages(participantFromID, participantToID, message, algorithmID, encryptedMessage, keyfile);
-        eventBus.post(new SendMessageEvent(encryptedMessage, participantFromID, algorithm, keyfile));
+        DBMessage.instance.insertDataTableMessages(participantFrom.getId(), participantToID, message, algorithmID, encryptedMessage, keyfile);
+        eventBus.post(new SendMessageEvent(encryptedMessage, participantFrom, algorithm, keyfile));
     }
 
     public void setIntruder(Subscriber intruder) {

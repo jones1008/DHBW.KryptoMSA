@@ -3,14 +3,14 @@ package companyNetwork;
 public class SendMessageEvent
 {
     private String message;
-    private int participantFromID;
+    private Participant participantFrom;
     private String algorithm;
     private String keyfile;
 
-    public SendMessageEvent(String message, int participantFromID, String algorithm, String keyfile)
+    public SendMessageEvent(String message, Participant participantFrom, String algorithm, String keyfile)
     {
         this.message = message;
-        this.participantFromID = participantFromID;
+        this.participantFrom = participantFrom;
         this.algorithm = algorithm;
         this.keyfile = keyfile;
     }
@@ -19,9 +19,9 @@ public class SendMessageEvent
         return message;
     }
 
-    public int getParticipantFromID()
+    public Participant getParticipantFrom()
     {
-        return participantFromID;
+        return participantFrom;
     }
 
     public String getAlgorithm()
