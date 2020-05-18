@@ -66,9 +66,12 @@ public enum ChannelManager implements IChannelManager {
         }
 
         String encryptedMessage = participant1.encrypt(message, algorithm, keyfile);
+        if (encryptedMessage.equals("")) {
+            return "An error occurred while encrypting";
+        }
         IChannel channel = CompanyNetwork.instance.getChannel(participant1, participant2);
         channel.send(message, encryptedMessage, participant1.getId(), algorithm, keyfile, participant2.getId());
 
-        return participant02 + "received new message";
+        return participant02 + " received new message";
     }
 }

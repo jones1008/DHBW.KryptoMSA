@@ -2,6 +2,7 @@ package companyNetwork;
 
 import com.google.common.eventbus.Subscribe;
 import cryptoManager.CryptoManager;
+import persistence.DBPostbox;
 
 public class Participant extends Subscriber {
     private ParticipantType type;
@@ -44,8 +45,7 @@ public class Participant extends Subscriber {
         if (sendMessageEvent.getParticipantFromID() == id) {
             return;
         }
-        System.out.println("Participant: " + name + ", Message: ");
-        System.out.println(sendMessageEvent.getMessage());
+
         switch (type) {
             case NORMAL:
                 receiveAsNormal(sendMessageEvent);
@@ -57,8 +57,9 @@ public class Participant extends Subscriber {
     }
 
     private void receiveAsNormal(SendMessageEvent sendMessageEvent) {
-        // TODO: decrypt message with cryptoManager
-        // TODO: HSQLDB.insertDataTablePostbox
+        CryptoManager manager = new CryptoManager();
+        String decrypted = manager.decrypt(sendMessageEvent.getMessage(), sendMessageEvent.getAlgorithm(), sendMessageEvent.getKeyfile());
+        DBPostbox.instance.insertDataTablePostbox(this.name, sendMessageEvent.getParticipantFromID(), decrypted);
     }
 
     private void receiveAsIntruder(SendMessageEvent sendMessageEvent) {

@@ -51,7 +51,7 @@ public class CryptoManager implements ICryptoManager
 
         log("Detected encryption algorithm '" + Configuration.instance.algorithm + "'");
         String encryptedMessage = crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
-        if (encryptedMessage != "") {
+        if (!encryptedMessage.equals("")) {
             log("Successfully encrypted message '" + message + "' to '" + encryptedMessage + "'");
         }
         return encryptedMessage;

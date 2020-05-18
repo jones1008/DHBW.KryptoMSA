@@ -1,5 +1,7 @@
 package persistence;
 
+import java.time.Instant;
+
 public enum DBMessage {
     instance;
     public void createTableMessages() {
@@ -26,6 +28,14 @@ public enum DBMessage {
 
         sql = "ALTER TABLE messages ADD CONSTRAINT fkMessages03 FOREIGN KEY (algorithm_id) " +
                 "REFERENCES algorithms (id) ON DELETE CASCADE";
+        DB.instance.update(sql);
+    }
+
+    public void insertDataTableMessages(int participantFromID, int participantToID, String plainMessage, int algorithmID, String encryptedMessage, String keyfile) {
+        int id = DB.instance.getNextID("messages");
+        long timestamp = Instant.now().getEpochSecond();
+        String sql = "INSERT INTO messages (id, participant_from_id, participant_to_id, plain_message, algorithm_id, encrypted_message, keyfile, timestamp) VALUES " +
+                "(" + id + ", " + participantFromID + ", " + participantToID + ", '" + plainMessage + "', " + algorithmID + ", '" + encryptedMessage + "', '" + keyfile + "', " + timestamp + ")";
         DB.instance.update(sql);
     }
 }

@@ -244,6 +244,20 @@ public class GUI extends Application {
         DBAlgorithm.instance.insertDataTableAlgorithms("shift");
     }
 
+    private void initParticipantsAndChannels() {
+        CompanyNetwork.instance.registerParticipant("branch_hkg", "normal");
+        CompanyNetwork.instance.registerParticipant("branch_cpt", "normal");
+        CompanyNetwork.instance.registerParticipant("branch_sfo", "normal");
+        CompanyNetwork.instance.registerParticipant("branch_syd", "normal");
+        CompanyNetwork.instance.registerParticipant("branch_wuh", "normal");
+        CompanyNetwork.instance.registerParticipant("msa", "intruder");
+
+        ChannelManager.instance.create("hkg_wuh", "branch_hkg", "branch_wuh");
+        ChannelManager.instance.create("hkg_cpt", "branch_hkg", "branch_cpt");
+        ChannelManager.instance.create("cpt_syd", "branch_cpt", "branch_syd");
+        ChannelManager.instance.create("syd_sfo", "branch_syd", "branch_sfo");
+    }
+
     private void shutdownDB() {
         DB.instance.shutdown();
     }
