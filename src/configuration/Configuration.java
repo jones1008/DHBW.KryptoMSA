@@ -3,8 +3,7 @@ package configuration;
 import application.Algorithm;
 
 public enum Configuration {
-    instance,
-    ;
+    instance;
 
     // common
     public final String userDirectory = System.getProperty("user.dir");

@@ -2,9 +2,7 @@ package companyNetwork;
 
 import persistence.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public enum CompanyNetwork {
     instance;
@@ -27,6 +25,25 @@ public enum CompanyNetwork {
         }
         return null;
     }
+    public String registerParticipant(String name, String type) {
+        if (getParticipantFromMapByName(name) != null) {
+            return "participant " + name + " already exists, using existing postbox_" + name;
+        }
+
+        int typeID = DBType.instance.getTypeID(type);
+        if (typeID == 0) {
+            return "Invalid type";
+        }
+        int participantID = DBParticipant.instance.insertDataTableParticipants(name, typeID);
+        DBPostbox.instance.createTablePostbox(name);
+
+        Participant participant = createParticipant(name, type, participantID);
+        if (participant == null) {
+            return "Error creating participant " + name;
+        }
+
+        return "participant " + participant.getName() + " with type " + participant.getType() + " registered and postbox_" + participant.getName() + " created";
+    }
     private Participant createParticipant(String name, String type, int participantID) {
         Participant participant;
 
@@ -43,22 +60,6 @@ public enum CompanyNetwork {
 
         addParticipantToMap(participant);
         return participant;
-    }
-    public String registerParticipant(String name, String type) {
-        if (getParticipantFromMapByName(name) != null) {
-            return "participant " + name + " already exists, using existing postbox_" + name;
-        }
-
-        int typeID = DBType.instance.getTypeID(type);
-        if (typeID == 0) {
-            return "Invalid type";
-        }
-        int participantID = DBParticipant.instance.insertDataTableParticipants(name, typeID);
-        DBPostbox.instance.createTablePostbox(name);
-
-        Participant participant = createParticipant(name, type, participantID);
-
-        return "participant " + participant.getName() + " with type " + participant.getType() + " registered and postbox_" + participant.getName() + " created";
     }
 
     // channel

@@ -8,7 +8,7 @@ public enum ChannelManager implements IChannelManager {
     instance;
     public String create(String name, String participant01, String participant02) {
         if (participant01.equals(participant02)) {
-            return participant01 + " and " + participant02 + " are identifical - cannot create channel on itself";
+            return participant01 + " and " + participant02 + " are identical - cannot create channel on itself";
         }
 
         Participant participant1 = CompanyNetwork.instance.getParticipantFromMapByName(participant01);
@@ -43,9 +43,8 @@ public enum ChannelManager implements IChannelManager {
                 ret += channel.getName() + " | " + channel.getParticipant01().getName() + " and " + channel.getParticipant02().getName() + "\n";
             }
             return ret;
-        } else {
-            return "No channels found.";
         }
+        return "No channels found.";
     }
 
 
@@ -79,6 +78,9 @@ public enum ChannelManager implements IChannelManager {
             return "An error occurred while encrypting";
         }
         IChannel channel = CompanyNetwork.instance.getChannel(participant1, participant2);
+        if (channel == null) {
+            return "Error getting channel between " + participant01 + " and " + participant02;
+        }
         channel.send(message, encryptedMessage, participant1, algorithm, keyfile, participant2.getId());
 
         return participant02 + " received new message";

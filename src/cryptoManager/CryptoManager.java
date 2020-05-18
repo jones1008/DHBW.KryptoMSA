@@ -7,11 +7,8 @@ import configuration.Configuration;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class CryptoManager implements ICryptoManager
@@ -34,7 +31,7 @@ public class CryptoManager implements ICryptoManager
 
         log("Detected decryption algorithm '" + Configuration.instance.algorithm + "'");
         String decryptedMessage = crypt(message, new File(Configuration.instance.keyfilesDirectory + keyfile));
-        if (decryptedMessage != "") {
+        if (!decryptedMessage.equals("")) {
             log("Successfully decrypted message '" + message + "' to '" + decryptedMessage + "'");
         }
         return decryptedMessage;
@@ -166,7 +163,7 @@ public class CryptoManager implements ICryptoManager
         try
         {
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            List<Future<String>> future = executor.invokeAll(Arrays.asList(new ShiftCrackTask(message, crackMethod, port)), Configuration.instance.crackTimeout, TimeUnit.SECONDS);
+            List<Future<String>> future = executor.invokeAll(Collections.singletonList(new ShiftCrackTask(message, crackMethod, port)), Configuration.instance.crackTimeout, TimeUnit.SECONDS);
             executor.shutdown();
             if (future.get(0).isCancelled()) {
                 return failedString;
@@ -182,6 +179,9 @@ public class CryptoManager implements ICryptoManager
     private String crackRSA(String message) {
         File[] rsaKeyfiles = new File(Configuration.instance.keyfilesDirectory).listFiles((dir, name) -> name.toLowerCase().startsWith("rsa"));
         List<Callable<String>> tasks = new ArrayList<>();
+        if (rsaKeyfiles == null) {
+            return "Error reading keyfiles";
+        }
         for (File file : rsaKeyfiles) {
             tasks.add(new RSACrackTask(message, file, crackMethod, port));
         }
