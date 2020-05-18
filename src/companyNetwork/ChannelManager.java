@@ -1,8 +1,7 @@
 package companyNetwork;
 
-import persistence.HSQLDB;
+import persistence.DBChannel;
 
-import java.util.List;
 import java.util.Map;
 
 public enum ChannelManager implements IChannelManager {
@@ -28,7 +27,7 @@ public enum ChannelManager implements IChannelManager {
         }
 
         IChannel channel = new Channel(name, participant1, participant2);
-        if (HSQLDB.instance.insertDataTableChannel(channel)) {
+        if (DBChannel.instance.insertDataTableChannel(channel)) {
             CompanyNetwork.instance.addChannelToMap(channel);
             return "channel " + name + " from " + participant01 + " to " + participant02 + " successfully created";
         }

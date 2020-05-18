@@ -1,6 +1,6 @@
 package companyNetwork;
 
-import persistence.HSQLDB;
+import persistence.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,12 +49,12 @@ public enum CompanyNetwork {
             return "participant " + name + " already exists, using existing postbox_" + name;
         }
 
-        int typeID = HSQLDB.instance.getTypeID(type);
+        int typeID = DBType.instance.getTypeID(type);
         if (typeID == 0) {
             return "Invalid type";
         }
-        int participantID = HSQLDB.instance.insertDataTableParticipants(name, typeID);
-        HSQLDB.instance.createTablePostbox(name);
+        int participantID = DBParticipant.instance.insertDataTableParticipants(name, typeID);
+        DBPostbox.instance.createTablePostbox(name);
 
         Participant participant = createParticipant(name, type, participantID);
 
@@ -95,7 +95,7 @@ public enum CompanyNetwork {
     }
     public String deleteChannel(String name) {
         if (isChannelRegistered(name)) {
-            if (HSQLDB.instance.deleteChannel(name)) {
+            if (DBChannel.instance.deleteChannel(name)) {
                 channelMap.remove(name);
                 return "channel " + name + " deleted";
             }
@@ -106,11 +106,11 @@ public enum CompanyNetwork {
 
     // general
     public void initMaps() {
-        List<Participant> participants = HSQLDB.instance.getAllParticipants();
+        List<Participant> participants = DBParticipant.instance.getAllParticipants();
         for (Participant participant : participants) {
             addParticipantToMap(participant);
         }
-        List<Channel> channels = HSQLDB.instance.getAllChannels();
+        List<Channel> channels = DBChannel.instance.getAllChannels();
         for (Channel channel : channels) {
             addChannelToMap(channel);
         }

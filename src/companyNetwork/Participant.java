@@ -2,7 +2,6 @@ package companyNetwork;
 
 import com.google.common.eventbus.Subscribe;
 import cryptoManager.CryptoManager;
-import persistence.HSQLDB;
 
 public class Participant extends Subscriber {
     private ParticipantType type;

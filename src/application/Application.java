@@ -2,7 +2,7 @@ package application;
 
 import companyNetwork.*;
 import cryptoManager.CryptoManager;
-import persistence.HSQLDB;
+import persistence.*;
 
 public class Application {
     public static void main(String... args)
@@ -16,22 +16,22 @@ public class Application {
     private static void hsqldbDemo() {
         // hsqldb demo
         System.out.println("-----hsqldb Demo-----");
-        HSQLDB.instance.setupConnection();
+        DB.instance.setupConnection();
 
-        HSQLDB.instance.dropTableParticipants();
-        HSQLDB.instance.dropTableTypes();
+        DBParticipant.instance.dropTableParticipants();
+        DBType.instance.dropTableTypes();
 
-        HSQLDB.instance.createTableTypes();
-        HSQLDB.instance.createTableAlgorithms();
-        HSQLDB.instance.createTableParticipants();
-        HSQLDB.instance.createTableChannel();
-        HSQLDB.instance.createTableMessages();
+        DBType.instance.createTableTypes();
+        DBAlgorithm.instance.createTableAlgorithms();
+        DBParticipant.instance.createTableParticipants();
+        DBChannel.instance.createTableChannel();
+        DBMessage.instance.createTableMessages();
 
-        HSQLDB.instance.insertDataTableTypes("normal");
-        HSQLDB.instance.insertDataTableTypes("intruder");
+        DBType.instance.insertDataTableTypes("normal");
+        DBType.instance.insertDataTableTypes("intruder");
 
-        HSQLDB.instance.insertDataTableAlgorithms("rsa");
-        HSQLDB.instance.insertDataTableAlgorithms("shift");
+        DBAlgorithm.instance.insertDataTableAlgorithms("rsa");
+        DBAlgorithm.instance.insertDataTableAlgorithms("shift");
 
 //        HSQLDB.instance.insertDataTableParticipants("branch_hkg", 1);
 //        HSQLDB.instance.insertDataTableParticipants("branch_cpt", 1);
@@ -40,7 +40,7 @@ public class Application {
 //        HSQLDB.instance.insertDataTableParticipants("branch_wuh", 1);
 //        HSQLDB.instance.insertDataTableParticipants("msa", 2);
 
-        HSQLDB.instance.shutdown();
+        DB.instance.shutdown();
     }
 
     private static void cryptoManagerDemo() {
@@ -107,7 +107,7 @@ public class Application {
     }
 
     private static void fillDBWithChannels() {
-        HSQLDB.instance.setupConnection();
+        DB.instance.setupConnection();
 
         System.out.println(CompanyNetwork.instance.registerParticipant("hkg", "normal"));
         System.out.println(CompanyNetwork.instance.registerParticipant("wuh", "normal"));
@@ -115,6 +115,6 @@ public class Application {
         System.out.println(ChannelManager.instance.create("hkg_wuh_test01", "hkg", "wuh"));
         System.out.println(ChannelManager.instance.create("wuh_hkg_test01", "wuh", "hkg"));
 
-        HSQLDB.instance.shutdown();
+        DB.instance.shutdown();
     }
 }
