@@ -114,7 +114,7 @@ public class GUI extends Application {
         } else if (commandText.equals("show channel")) {
             resultText = showChannel();
         } else if (commandText.matches("drop channel .*")) {
-            resultText = dropChannel(commandText);
+            resultText = deleteChannel(commandText);
         } else if (commandText.matches("intrude channel .* by .*")) {
             resultText = intrudeChannel(commandText);
         } else if (commandText.matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
@@ -205,9 +205,9 @@ public class GUI extends Application {
         return ChannelManager.instance.showAllChannels();
     }
 
-    private String dropChannel(String command) {
+    private String deleteChannel(String command) {
         String[] splitted = command.split(" "); // [0]: crack encrypted message; [1]: [message]; [2]: using [algorithm]
-        return ChannelManager.instance.dropChannel(splitted[2]);
+        return ChannelManager.instance.deleteChannel(splitted[2]);
     }
 
     private String intrudeChannel(String command) {

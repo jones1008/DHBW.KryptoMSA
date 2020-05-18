@@ -358,12 +358,9 @@ public enum HSQLDB {
                      "VALUES ('" + channel.getName() + "', " + channel.getParticipant01().getId() + ", " + channel.getParticipant02().getId() + ")";
         update(sql);
     }
-    public String deleteChannel(String name) {
+    public boolean deleteChannel(String name) {
         String sql = "DELETE FROM channel WHERE name='" + name + "'";
-        if (update(sql)) {
-            return "channel " + name + " deleted";
-        }
-        return "Error deleting channel " + name;
+        return update(sql);
     }
     public boolean channelExists(String name) {
         String sql = "SELECT * FROM channel WHERE name='"+name+"'";

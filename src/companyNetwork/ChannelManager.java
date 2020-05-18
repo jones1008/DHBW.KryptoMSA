@@ -3,6 +3,7 @@ package companyNetwork;
 import persistence.HSQLDB;
 
 import java.util.List;
+import java.util.Map;
 
 public enum ChannelManager implements IChannelManager {
     instance;
@@ -34,11 +35,10 @@ public enum ChannelManager implements IChannelManager {
     }
 
     public String showAllChannels() {
-        // TODO für jones1008: Infos von der Map holen
-        List<Channel> channels = HSQLDB.instance.getAllChannels();
-        if (channels != null) {
+        Map<String, IChannel> channelMap = CompanyNetwork.instance.getChannelMap();
+        if (!channelMap.isEmpty()) {
             String ret = "";
-            for (Channel channel : channels) {
+            for (IChannel channel : channelMap.values()) {
                 ret += channel.getName() + " | branch_" + channel.getParticipant01().getName() + " and branch_" + channel.getParticipant02().getName() + "\n";
             }
             return ret;
@@ -46,10 +46,14 @@ public enum ChannelManager implements IChannelManager {
             return "No channels found.";
         }
     }
-
-    public String dropChannel(String name) {
-        if (HSQLDB.instance.channelExists(name)) {
-            return HSQLDB.instance.deleteChannel(name);
+    public String deleteChannel(String name) {
+        Map<String, IChannel> channelMap = CompanyNetwork.instance.getChannelMap();
+        if (channelMap.get(name) != null) {
+            if (HSQLDB.instance.deleteChannel(name)) {
+                channelMap.remove(name);
+                return "channel " + name + " deleted";
+            }
+            return "Error deleting channel " + name;
         }
         return "unknown channel " + name;
     }

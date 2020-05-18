@@ -82,6 +82,9 @@ public enum CompanyNetwork {
         }
         return false;
     }
+    public Map<String, IChannel> getChannelMap() {
+        return channelMap;
+    }
 
     // general
     public void initMaps() {
