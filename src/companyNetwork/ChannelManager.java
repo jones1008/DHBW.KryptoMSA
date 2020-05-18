@@ -28,10 +28,12 @@ public enum ChannelManager implements IChannelManager {
         }
 
         IChannel channel = new Channel(name, participant1, participant2);
-        CompanyNetwork.instance.addChannelToMap(channel);
-        HSQLDB.instance.insertDataTableChannel(channel);
+        if (HSQLDB.instance.insertDataTableChannel(channel)) {
+            CompanyNetwork.instance.addChannelToMap(channel);
+            return "channel " + name + " from " + participant01 + " to " + participant02 + " successfully created";
+        }
 
-        return "channel " + name + " from " + participant01 + " to " + participant02 + " successfully created";
+        return "Error creating channel " + name;
     }
 
     public String showAllChannels() {

@@ -353,10 +353,10 @@ public enum HSQLDB {
         System.out.println("sqlStringBuilder : " + sqlStringBuilder03.toString());
         update(sqlStringBuilder03.toString());
     }
-    public void insertDataTableChannel(IChannel channel) {
+    public boolean insertDataTableChannel(IChannel channel) {
         String sql = "INSERT INTO channel (name, participant_01, participant_02) " +
                      "VALUES ('" + channel.getName() + "', " + channel.getParticipant01().getId() + ", " + channel.getParticipant02().getId() + ")";
-        update(sql);
+        return update(sql);
     }
     public boolean deleteChannel(String name) {
         String sql = "DELETE FROM channel WHERE name='" + name + "'";

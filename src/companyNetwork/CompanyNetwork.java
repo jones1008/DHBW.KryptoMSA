@@ -66,10 +66,7 @@ public enum CompanyNetwork {
         this.channelMap.put(channel.getName(), channel);
     }
     public boolean isChannelRegistered(String name) {
-        if (channelMap.containsKey(name)) {
-            return true;
-        }
-        return false;
+        return channelMap.containsKey(name);
     }
     public boolean isChannelRegistered(Subscriber participant1, Subscriber participant2) {
         for (IChannel channel : channelMap.values()) {
