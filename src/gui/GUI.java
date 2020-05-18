@@ -17,7 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import persistence.HSQLDB;
+import persistence.*;
 
 public class GUI extends Application {
     private boolean debugActive = false;
@@ -219,26 +219,26 @@ public class GUI extends Application {
     }
 
     private void setupDB() {
-        HSQLDB.instance.setupConnection();
+        DB.instance.setupConnection();
 
-        HSQLDB.instance.dropTableParticipants();
-        HSQLDB.instance.dropTableTypes();
+        DBParticipant.instance.dropTableParticipants();
+        DBType.instance.dropTableTypes();
 
-        HSQLDB.instance.createTableTypes();
-        HSQLDB.instance.createTableAlgorithms();
-        HSQLDB.instance.createTableParticipants();
-        HSQLDB.instance.createTableChannel();
-        HSQLDB.instance.createTableMessages();
+        DBType.instance.createTableTypes();
+        DBAlgorithm.instance.createTableAlgorithms();
+        DBParticipant.instance.createTableParticipants();
+        DBChannel.instance.createTableChannel();
+        DBMessage.instance.createTableMessages();
 
-        HSQLDB.instance.insertDataTableTypes("normal");
-        HSQLDB.instance.insertDataTableTypes("intruder");
+        DBType.instance.insertDataTableTypes("normal");
+        DBType.instance.insertDataTableTypes("intruder");
 
-        HSQLDB.instance.insertDataTableAlgorithms("rsa");
-        HSQLDB.instance.insertDataTableAlgorithms("shift");
+        DBAlgorithm.instance.insertDataTableAlgorithms("rsa");
+        DBAlgorithm.instance.insertDataTableAlgorithms("shift");
     }
 
     private void shutdownDB() {
-        HSQLDB.instance.shutdown();
+        DB.instance.shutdown();
     }
 
     private void initTestBranches() {

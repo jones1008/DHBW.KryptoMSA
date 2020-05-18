@@ -1,7 +1,5 @@
 package companyNetwork;
 
-import persistence.HSQLDB;
-
 public class Participant extends Subscriber {
     private ParticipantType type;
 
