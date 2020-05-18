@@ -15,6 +15,7 @@ public class Channel implements IChannel {
         this.participant01 = participant01;
         this.participant02 = participant02;
         this.eventBus = new EventBus();
+        // TODO: add participants as listeners
     }
 
     public void setIntruder(Subscriber intruder) {
