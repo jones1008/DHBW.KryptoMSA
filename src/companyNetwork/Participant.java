@@ -5,20 +5,27 @@ import persistence.HSQLDB;
 public class Participant extends Subscriber {
     private ParticipantType type;
 
-    public Participant(String name, ParticipantType type) {
-        super(HSQLDB.instance.getNextID("participants"), name);
-        this.type = type;
-    }
-
     public Participant(int id, String name, ParticipantType type)
     {
         super(id, name);
         this.type = type;
     }
 
-    public boolean equals() {
-        // TODO: implementieren
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (! (obj instanceof Participant)) {
+            return false;
+        }
+
+        Participant other = (Participant) obj;
+
+        return this.id == other.id &&
+                this.name.equals(other.name) &&
+                this.type == other.type;
     }
 
     public String getType()
