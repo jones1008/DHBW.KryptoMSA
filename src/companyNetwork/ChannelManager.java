@@ -36,6 +36,7 @@ public enum ChannelManager implements IChannelManager {
     }
 
     public String showAllChannels() {
+        // TODO für jones1008: Infos von der Map holen
         List<Channel> channels = HSQLDB.instance.getAllChannels();
         if (channels != null) {
             String ret = "";

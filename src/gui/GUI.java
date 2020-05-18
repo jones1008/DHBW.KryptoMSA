@@ -25,6 +25,7 @@ public class GUI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("MSA | Mosbach Security Agency");
         setupDB();
+        CompanyNetwork.instance.initMaps();
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(15, 12, 15, 12));

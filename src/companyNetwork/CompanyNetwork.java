@@ -3,55 +3,47 @@ package companyNetwork;
 import persistence.HSQLDB;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum CompanyNetwork {
     instance;
 
-    private Map<Integer, Subscriber> participantMap = new HashMap<>();
+    private Map<Integer, Participant> participantMap = new HashMap<>();
     private Map<String, IChannel> channelMap = new HashMap<>();
 
-    public void addSubscriberToMap(Subscriber subscriber) {
-        this.participantMap.put(subscriber.getId(), subscriber);
-    }
-
-    public void addChannelToMap(IChannel channel) {
-        this.channelMap.put(channel.getName(), channel);
-    }
-
-    public Participant getParticipantFromMapByName(String name) {
-        for (Subscriber subscriber : participantMap.values()) {
-            if (subscriber.getName().equals(name)) {
-                return (Participant) subscriber;
-            }
-        }
-        return null;
+    // participant
+    public void addParticipantToMap(Participant participant) {
+        this.participantMap.put(participant.getId(), participant);
     }
     public Participant getParticipantFromMapById(int id) {
-        for (Subscriber subscriber : participantMap.values()) {
-            if (subscriber.getId() == id) {
-                return (Participant) subscriber;
+        return participantMap.get(id);
+    }
+    public Participant getParticipantFromMapByName(String name) {
+        for (Participant participant : participantMap.values()) {
+            if (participant.getName().equals(name)) {
+                return participant;
             }
         }
         return null;
     }
+    public Participant createParticipant(String name, String type, int participantID) {
+        Participant participant;
 
-    public boolean isChannelRegistered(String name, Subscriber participant1, Subscriber participant2) {
-        if (channelMap.containsKey(name)) {
-            return true;
+        switch (type.toLowerCase()) {
+            case "normal":
+                participant = new Participant(participantID, name, ParticipantType.NORMAL);
+                break;
+            case "intruder":
+                participant = new Participant(participantID, name, ParticipantType.INTRUDER);
+                break;
+            default:
+                return null;
         }
 
-        for (IChannel channel : channelMap.values()) {
-            if ((channel.getParticipant01().equals(participant1)
-                    || channel.getParticipant01().equals(participant2))
-                    && (channel.getParticipant02().equals(participant1)
-                    || channel.getParticipant02().equals(participant2))) {
-                return true;
-            }
-        }
-        return false;
+        addParticipantToMap(participant);
+        return participant;
     }
-
     public String registerParticipant(String name, String type) {
         if (HSQLDB.instance.participantExists(name)) {
             if (getParticipantFromMapByName(name) == null) {
@@ -73,25 +65,35 @@ public enum CompanyNetwork {
         return "participant " + participant.getName() + " with type " + participant.getType() + " registered and postbox_" + participant.getName() + " created";
     }
 
-    public Participant createParticipant(String name, String type, int participantID) {
-        Participant participant;
-
-        switch (type.toLowerCase()) {
-            case "normal":
-                participant = new Participant(participantID, name, ParticipantType.NORMAL);
-                break;
-            case "intruder":
-                participant = new Participant(participantID, name, ParticipantType.INTRUDER);
-                break;
-            default:
-                return null;
+    // channel
+    public void addChannelToMap(IChannel channel) {
+        this.channelMap.put(channel.getName(), channel);
+    }
+    public boolean isChannelRegistered(String name, Subscriber participant1, Subscriber participant2) {
+        if (channelMap.containsKey(name)) {
+            return true;
         }
 
-        addSubscriberToMap(participant);
-        return participant;
+        for (IChannel channel : channelMap.values()) {
+            if ((channel.getParticipant01().equals(participant1)
+                    || channel.getParticipant01().equals(participant2))
+                    && (channel.getParticipant02().equals(participant1)
+                    || channel.getParticipant02().equals(participant2))) {
+                return true;
+            }
+        }
+        return false;
     }
 
-//    public void initMaps() {
-//        HSQLDB.instance.getAllParticipants()
-//    }
+    // general
+    public void initMaps() {
+        List<Participant> participants = HSQLDB.instance.getAllParticipants();
+        for (Participant participant : participants) {
+            addParticipantToMap(participant);
+        }
+        List<Channel> channels = HSQLDB.instance.getAllChannels();
+        for (Channel channel : channels) {
+            addChannelToMap(channel);
+        }
+    }
 }
