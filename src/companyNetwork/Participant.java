@@ -2,6 +2,7 @@ package companyNetwork;
 
 import com.google.common.eventbus.Subscribe;
 import cryptoManager.CryptoManager;
+import gui.GUI;
 import persistence.DBPostbox;
 
 public class Participant extends Subscriber {
@@ -59,6 +60,7 @@ public class Participant extends Subscriber {
     private void receiveAsNormal(SendMessageEvent sendMessageEvent) {
         CryptoManager manager = new CryptoManager();
         String decrypted = manager.decrypt(sendMessageEvent.getMessage(), sendMessageEvent.getAlgorithm(), sendMessageEvent.getKeyfile());
+        GUI.setOutputText("message: " + decrypted);
         DBPostbox.instance.insertDataTablePostbox(this.name, sendMessageEvent.getParticipantFromID(), decrypted);
     }
 

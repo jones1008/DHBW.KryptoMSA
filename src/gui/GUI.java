@@ -1,27 +1,21 @@
 package gui;
 
-import companyNetwork.Channel;
-import companyNetwork.ChannelManager;
-import companyNetwork.CompanyNetwork;
+import companyNetwork.*;
 import cryptoManager.CryptoManager;
 import logger.Logger;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import persistence.*;
 
 public class GUI extends Application {
     private boolean debugActive = false;
+    private static TextArea outputArea;
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("MSA | Mosbach Security Agency");
@@ -42,19 +36,14 @@ public class GUI extends Application {
         TextArea commandLineArea = new TextArea();
         commandLineArea.setWrapText(true);
 
-        TextArea outputArea = new TextArea();
+        outputArea = new TextArea();
 
-        executeButton.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                execute(commandLineArea, outputArea);
-            }
-        });
+        executeButton.setOnAction(event -> execute(commandLineArea, outputArea));
 
-        closeButton.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent actionEvent) {
-                shutdownDB();
-                System.exit(0);
-            }
+        closeButton.setOnAction(actionEvent ->
+        {
+            shutdownDB();
+            System.exit(0);
         });
 
         outputArea.setWrapText(true);
@@ -70,6 +59,10 @@ public class GUI extends Application {
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> keyPressed(key.getCode(), commandLineArea, outputArea));
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public static void setOutputText(String text) {
+        outputArea.setText(outputArea.getText() + "\n" + text);
     }
 
     private void keyPressed(KeyCode key, TextArea command, TextArea output) {
@@ -94,10 +87,10 @@ public class GUI extends Application {
     }
 
     private void execute(TextArea command, TextArea output) {
+        output.setText("");
         System.out.println("--- execute ---");
         CryptoManager cryptoManager = new CryptoManager();
-//        ChannelManager channelManager = new ChannelManager();
-        String resultText = "";
+        String resultText;
         String commandText = getCommand(command);
 
         if (commandText.equals("show algorithm")) {
@@ -124,7 +117,7 @@ public class GUI extends Application {
             resultText = "Invalid Input";
         }
 
-        output.setText(resultText);
+        setOutputText(resultText);
     }
 
     private String getCommand(TextArea command) {
