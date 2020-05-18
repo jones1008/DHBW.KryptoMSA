@@ -66,10 +66,7 @@ public enum CompanyNetwork {
         this.channelMap.put(channel.getName(), channel);
     }
     public boolean isChannelRegistered(String name) {
-        if (channelMap.containsKey(name)) {
-            return true;
-        }
-        return false;
+        return channelMap.containsKey(name);
     }
     public boolean isChannelRegistered(Subscriber participant1, Subscriber participant2) {
         for (IChannel channel : channelMap.values()) {
@@ -84,6 +81,16 @@ public enum CompanyNetwork {
     }
     public Map<String, IChannel> getChannelMap() {
         return channelMap;
+    }
+    public String deleteChannel(String name) {
+        if (isChannelRegistered(name)) {
+            if (HSQLDB.instance.deleteChannel(name)) {
+                channelMap.remove(name);
+                return "channel " + name + " deleted";
+            }
+            return "Error deleting channel " + name;
+        }
+        return "unknown channel " + name;
     }
 
     // general
