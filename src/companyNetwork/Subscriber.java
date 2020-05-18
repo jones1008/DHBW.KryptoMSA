@@ -6,10 +6,6 @@ public abstract class Subscriber {
     protected int id;
     protected String name;
 
-    public Subscriber(int id) {
-        this.id = id;
-    }
-
     public Subscriber(int id, String name) {
         this.id = id;
         this.name = name;

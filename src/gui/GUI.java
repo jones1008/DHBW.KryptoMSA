@@ -196,8 +196,6 @@ public class GUI extends Application {
         String participant01 = splitted[4];
         String participant02 = splitted[6];
 
-        initTestBranches();
-
         return ChannelManager.instance.create(channelName, participant01, participant02);
     }
 
@@ -239,10 +237,5 @@ public class GUI extends Application {
 
     private void shutdownDB() {
         HSQLDB.instance.shutdown();
-    }
-
-    private void initTestBranches() {
-        System.out.println(CompanyNetwork.instance.registerParticipant("branch_hkg", "normal"));
-        System.out.println(CompanyNetwork.instance.registerParticipant("branch_wuh", "normal"));
     }
 }
