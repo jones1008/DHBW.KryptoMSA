@@ -36,19 +36,38 @@ public enum DBPostbox {
     public void updateMessageTablePostbox(String name, String message) {
         int postboxID = getPostboxId(name);
         if (postboxID != -1) {
+            message = message.substring(0, 50);
             String sql = "UPDATE postbox_" + name + " SET message='" + message + "' WHERE id=" + postboxID;
-            if (!DB.instance.update(sql)) {
+            if (DB.instance.update(sql)) {
                 System.out.println("Successfully updated message in table postbox_" + name);
+                return;
             }
         }
         System.out.println("Error updating message in table postbox_" + name);
     }
 
+    public String showPostbox(String name) {
+        String sql = "SELECT * FROM postbox_" + name;
+        ResultSet set = DB.instance.executeQuery(sql);
+        String returnString = "";
+        try {
+            while (set.next()) {
+                returnString += set.getInt("id") + " | " +
+                        set.getInt("participant_from_id") + " | " +
+                        set.getString("message") + " | " +
+                        set.getInt("timestamp") + "\n";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return returnString;
+    }
+
     private int getPostboxId(String name) {
         try {
-            ResultSet rs = DB.instance.executeQuery("SELECT id FROM postbox_" + name);
+            ResultSet rs = DB.instance.executeQuery("SELECT MAX(id) FROM postbox_" + name);
             while (rs != null && rs.next()) {
-                return rs.getInt("id");
+                return rs.getInt(1);
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();

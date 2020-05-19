@@ -6,7 +6,6 @@ import configuration.Configuration;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -73,18 +72,7 @@ public class CryptoManager implements ICryptoManager
 
         createCrackMethod();
 
-        String result = "";
-
-        switch (Configuration.instance.algorithm) {
-            case SHIFT:
-                result = crackShift(message);
-                break;
-            case RSA:
-                result = crackRSA(message);
-                break;
-        }
-
-        return result;
+        return crack(message);
     }
 
 
@@ -158,40 +146,27 @@ public class CryptoManager implements ICryptoManager
         return "";
     }
 
-    private String crackShift(String message) {
-        String failedString = "Error: cracking encrypted message \"" + message + "\" failed";
-        try
-        {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            List<Future<String>> future = executor.invokeAll(Collections.singletonList(new ShiftCrackTask(message, crackMethod, port)), Configuration.instance.crackTimeout, TimeUnit.SECONDS);
-            executor.shutdown();
-            if (future.get(0).isCancelled()) {
-                return failedString;
-            }
-            return future.get(0).get();
-        } catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedString;
-        }
-    }
-
-    private String crackRSA(String message) {
-        File[] rsaKeyfiles = new File(Configuration.instance.keyfilesDirectory).listFiles((dir, name) -> name.toLowerCase().startsWith("rsa"));
+    private String crack(String message) {
+        String returnString = "Error: cracking encrypted message \"" + message + "\" failed";
         List<Callable<String>> tasks = new ArrayList<>();
-        if (rsaKeyfiles == null) {
-            return "Error reading keyfiles";
-        }
-        for (File file : rsaKeyfiles) {
-            tasks.add(new RSACrackTask(message, file, crackMethod, port));
+        switch (Configuration.instance.algorithm) {
+            case RSA:
+                tasks = fillRSATasks(message);
+                break;
+            case SHIFT:
+                tasks = fillShiftTasks(message);
+                break;
         }
 
-        String failedString = "Error: cracking encrypted message \"" + message + "\" failed";
+        if (tasks == null || tasks.size() < 1) {
+            return returnString;
+        }
+
+        String prefix = Configuration.instance.algorithm.toString().toLowerCase() + "CrackerThreads";
+        ThreadFactory factory = new WorkerThreadFactory(prefix);
+        ExecutorService executor = Executors.newFixedThreadPool(tasks.size(), factory);
         try
         {
-            String prefix = "rsaCrackerThreads";
-            ThreadFactory factory = new WorkerThreadFactory(prefix);
-            ExecutorService executor = Executors.newFixedThreadPool(tasks.size(), factory);
             List<Future<String>> futures = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
             executor.shutdownNow();
 
@@ -207,13 +182,27 @@ public class CryptoManager implements ICryptoManager
                     return future.get();
                 }
             }
-
-            return failedString;
-        } catch (Exception ex)
+        } catch (InterruptedException | ExecutionException e)
         {
-            ex.printStackTrace();
-            return failedString;
+            e.printStackTrace();
         }
+        return returnString;
+    }
+
+    private List<Callable<String>> fillRSATasks(String message) {
+        File[] rsaKeyfiles = new File(Configuration.instance.keyfilesDirectory).listFiles((dir, name) -> name.toLowerCase().startsWith("rsa"));
+        List<Callable<String>> tasks = new ArrayList<>();
+        if (rsaKeyfiles == null) {
+            return null;
+        }
+        for (File file : rsaKeyfiles) {
+            tasks.add(new RSACrackTask(message, file, crackMethod, port));
+        }
+        return tasks;
+    }
+
+    private List<Callable<String>> fillShiftTasks(String message) {
+        return Collections.singletonList(new ShiftCrackTask(message, crackMethod, port));
     }
 
     public void setLogger(ILogger logger) {

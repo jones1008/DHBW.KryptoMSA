@@ -8,7 +8,7 @@ public class Application {
     {
 //        cryptoManagerDemo();
 //        System.out.println();
-//        crackerDemo();
+        crackerDemo();
     }
 
     private static void hsqldbDemo() {

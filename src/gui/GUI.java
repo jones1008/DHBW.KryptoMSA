@@ -119,7 +119,10 @@ public class GUI extends Application {
             resultText = intrudeChannel(commandText);
         } else if (commandText.matches("send message \".*\" from .* to .* using .* and keyfile .*")) {
             resultText = sendMessage(commandText);
-        } else {
+        } else if (commandText.matches("show postbox .*")) {
+            resultText = showPostbox(commandText);
+        }
+        else {
             resultText = "Invalid Input";
         }
 
@@ -225,6 +228,12 @@ public class GUI extends Application {
         String keyfile = splitted[8];
 
         return ChannelManager.instance.sendMessage(message, participant01, participant02, algorithm, keyfile);
+    }
+
+    private String showPostbox(String command) {
+        String[] splitted = command.split(" ");
+        String name = splitted[2];
+        return DBPostbox.instance.showPostbox(name);
     }
 
     private void setupDB() {
