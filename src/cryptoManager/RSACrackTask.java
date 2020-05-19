@@ -1,7 +1,7 @@
 package cryptoManager;
 
 import java.io.File;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.math.BigInteger;
 import java.util.Base64;
 import java.util.concurrent.Callable;
@@ -24,13 +24,16 @@ public class RSACrackTask implements Callable<String>
     }
 
     @Override
-    public String call() throws Exception
+    public String call()
     {
-        BigInteger messageInt = new BigInteger(Base64.getDecoder().decode(message));
-
         try {
-            return (String) crackMethod.invoke(port, messageInt, key);
-        } catch (Exception ex) {
+            return (String) crackMethod.invoke(port, message, key);
+        } catch (InvocationTargetException ex) {
+            if (ex.getCause() instanceof ThreadDeath) {
+                System.out.println("Cracking is canceled");
+            }
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;

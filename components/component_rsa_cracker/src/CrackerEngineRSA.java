@@ -23,7 +23,7 @@ public class CrackerEngineRSA
         return instance;
     }
 
-    private String innerMethodDecrypt(BigInteger message, File keyfile) {
+    private String innerMethodDecrypt(String encryptedMessage, File keyfile) {
         readKeyfile(keyfile);
         BigInteger p, q, d;
         List<BigInteger> factorList = factorize(n);
@@ -36,6 +36,7 @@ public class CrackerEngineRSA
         q = factorList.get(1);
         BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
         d = e.modInverse(phi);
+        BigInteger message = new BigInteger(Base64.getDecoder().decode(encryptedMessage));
         return new String(message.modPow(d, n).toByteArray());
     }
 
@@ -104,7 +105,7 @@ public class CrackerEngineRSA
 
     public class Port implements ICrackerEngine
     {
-        public String decrypt(BigInteger message, File keyfile)
+        public String decrypt(String message, File keyfile)
         {
             return innerMethodDecrypt(message, keyfile);
         }

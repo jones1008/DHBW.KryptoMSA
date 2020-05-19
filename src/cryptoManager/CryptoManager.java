@@ -136,7 +136,7 @@ public class CryptoManager implements ICryptoManager
                     crackMethod = port.getClass().getMethod("decrypt", String.class); // shfit parameters: String message
                     break;
                 case RSA:
-                    crackMethod = port.getClass().getMethod("decrypt", BigInteger.class, File.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n
+                    crackMethod = port.getClass().getMethod("decrypt", String.class, File.class); // rsa parameters: BigInteger message, BigInteger e, BigInteger n
                     break;
             }
         } catch (Exception e) {
@@ -189,9 +189,18 @@ public class CryptoManager implements ICryptoManager
         String failedString = "Error: cracking encrypted message \"" + message + "\" failed";
         try
         {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
+            String prefix = "rsaCrackerThreads";
+            ThreadFactory factory = new WorkerThreadFactory(prefix);
+            ExecutorService executor = Executors.newFixedThreadPool(tasks.size(), factory);
             List<Future<String>> futures = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
-            executor.shutdown();
+            executor.shutdownNow();
+
+            Object[] threads = Thread.getAllStackTraces().keySet().toArray(); // threads are not terminated by the shutdown method, must be terminated manually
+            for (Object obj : threads) {
+                if (obj instanceof Thread && ((Thread) obj).getName().startsWith(prefix)) {
+                    ((Thread) obj).stop();
+                }
+            }
 
             for (Future<String> future : futures) {
                 if (!future.isCancelled()) {
