@@ -3,6 +3,7 @@ package cryptoManager;
 import java.io.File;
 import java.lang.reflect.*;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.concurrent.Callable;
 
@@ -29,9 +30,7 @@ public class RSACrackTask implements Callable<String>
         try {
             return (String) crackMethod.invoke(port, message, key);
         } catch (InvocationTargetException ex) {
-            if (ex.getCause() instanceof ThreadDeath) {
-                System.out.println("Cracking is canceled");
-            }
+            System.out.println("Cracking is canceled");
         }
         catch (Exception ex) {
             ex.printStackTrace();

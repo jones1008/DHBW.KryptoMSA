@@ -23,13 +23,14 @@ public class CrackerEngineRSA
         return instance;
     }
 
-    private String innerMethodDecrypt(String encryptedMessage, File keyfile) {
+    private String innerMethodDecrypt(String encryptedMessage, File keyfile) throws InterruptedException
+    {
         readKeyfile(keyfile);
         BigInteger p, q, d;
         List<BigInteger> factorList = factorize(n);
 
-        if (factorList.size() != 2) {
-            return "cannot determine factors p and q";
+        if (factorList == null || factorList.size() != 2) {
+            throw new InterruptedException("cannot determine factors p and q");
         }
 
         p = factorList.get(0);
@@ -51,6 +52,10 @@ public class CrackerEngineRSA
         while (n.mod(two).equals(BigInteger.ZERO)) {
             factorList.add(two);
             n = n.divide(two);
+
+            if (Thread.currentThread().isInterrupted()){
+                return null;
+            }
         }
 
         if (n.compareTo(BigInteger.ONE) > 0) {
@@ -61,6 +66,10 @@ public class CrackerEngineRSA
                     n = n.divide(factor);
                 } else {
                     factor = factor.add(two);
+                }
+
+                if (Thread.currentThread().isInterrupted()) {
+                    return null;
                 }
             }
             factorList.add(n);
@@ -105,7 +114,7 @@ public class CrackerEngineRSA
 
     public class Port implements ICrackerEngine
     {
-        public String decrypt(String message, File keyfile)
+        public String decrypt(String message, File keyfile) throws InterruptedException
         {
             return innerMethodDecrypt(message, keyfile);
         }

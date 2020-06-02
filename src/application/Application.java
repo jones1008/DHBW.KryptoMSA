@@ -3,12 +3,15 @@ package application;
 import cryptoManager.CryptoManager;
 import persistence.*;
 
+import java.time.Instant;
+
 public class Application {
     public static void main(String... args)
     {
 //        cryptoManagerDemo();
 //        System.out.println();
-        crackerDemo();
+//        crackerDemo();
+        rsaCrackerDemo();
     }
 
     private static void hsqldbDemo() {
@@ -44,9 +47,9 @@ public class Application {
 
         System.out.println();
         System.out.println("RSA:");
-        String message = "morpheus";
+        String message = "test";
         String algorithm = "rsa";
-        String keyfile = "rsa_keyfile2.json";
+        String keyfile = "rsa_keyfile.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
         String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
         System.out.println("message: " + message);
@@ -82,6 +85,24 @@ public class Application {
         message = "MDFsO4jlFDkcLgM1";
         algorithm = "rsa";
         cracked = manager.crack(message, algorithm);
+        System.out.println("message: " + message);
+        System.out.println("cracked: ");
+        System.out.println(cracked);
+    }
+
+    private static void rsaCrackerDemo() {
+        CryptoManager manager = new CryptoManager();
+        System.out.println("started at " + Instant.now());
+        System.out.println("encrypt RSA: ");
+        String message = "morpheus";
+        String algorithm = "rsa";
+        String keyfile = "rsa_keyfile.json";
+        String encrypted = manager.encrypt(message, algorithm, keyfile);
+        String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
+        System.out.println("plain message: " + message + "; encrypted: " + encrypted + "; used keyfile: " + keyfile + "; decrypted: " + decrypted);
+
+        System.out.println("Crack RSA: ");
+        String cracked = manager.crack(encrypted, algorithm);
         System.out.println("message: " + message);
         System.out.println("cracked: ");
         System.out.println(cracked);

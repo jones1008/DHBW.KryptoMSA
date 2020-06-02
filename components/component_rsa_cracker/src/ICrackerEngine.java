@@ -3,5 +3,5 @@ import java.math.BigInteger;
 
 public interface ICrackerEngine
 {
-    String decrypt(String message, File keyfile);
+    String decrypt(String message, File keyfile) throws InterruptedException;
 }

@@ -170,17 +170,20 @@ public class CryptoManager implements ICryptoManager
             List<Future<String>> futures = executor.invokeAll(tasks, Configuration.instance.crackTimeout, TimeUnit.SECONDS);
             executor.shutdownNow();
 
-            Object[] threads = Thread.getAllStackTraces().keySet().toArray(); // threads are not terminated by the shutdown method, must be terminated manually
-            for (Object obj : threads) {
-                if (obj instanceof Thread && ((Thread) obj).getName().startsWith(prefix)) {
-                    ((Thread) obj).stop();
-                }
-            }
+            List<String> successful = new ArrayList<>();
 
             for (Future<String> future : futures) {
                 if (!future.isCancelled()) {
-                    return future.get();
+                    successful.add(future.get());
+                    //return future.get();
                 }
+            }
+            if (successful.size() > 0) {
+                String successfulString = "";
+                for (String string : successful) {
+                    successfulString += string + " | ";
+                }
+                return successfulString.substring(0, successfulString.length()-2);
             }
         } catch (InterruptedException | ExecutionException e)
         {
