@@ -49,7 +49,7 @@ public class Application {
         System.out.println("RSA:");
         String message = "test";
         String algorithm = "rsa";
-        String keyfile = "rsa_keyfile.json";
+        String keyfile = "rsa_keyfile1.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
         String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
         System.out.println("message: " + message);
@@ -96,7 +96,7 @@ public class Application {
         System.out.println("encrypt RSA: ");
         String message = "morpheus";
         String algorithm = "rsa";
-        String keyfile = "rsa_keyfile.json";
+        String keyfile = "rsa_keyfile1.json";
         String encrypted = manager.encrypt(message, algorithm, keyfile);
         String decrypted = manager.decrypt(encrypted, algorithm, keyfile);
         System.out.println("plain message: " + message + "; encrypted: " + encrypted + "; used keyfile: " + keyfile + "; decrypted: " + decrypted);
