@@ -18,7 +18,7 @@ public class GUI extends Application {
     private static TextArea outputArea;
 
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("MSA | Mosbach Security Agency");
+        primaryStage.setTitle("MSA | Mosbach Security Agency | von 8093702 und 9752762");
         setupDB();
         CompanyNetwork.instance.initMaps();
 
@@ -177,7 +177,7 @@ public class GUI extends Application {
     private String crackMessage(String command, CryptoManager manager) {
         String[] splitted = command.split("\""); // [0]: crack encrypted message; [1]: [message]; [2]: using [algorithm]
         String message = splitted[1];
-        splitted = splitted[2].split(" "); // [0]: ""; [1]: using; [2]: [algorithm]
+        splitted = splitted[2].split(" "); // [0]: ; [1]: using; [2]: [algorithm]
         String algorithm = splitted[2];
         return manager.crack(message, algorithm);
     }

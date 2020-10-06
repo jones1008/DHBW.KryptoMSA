@@ -38,7 +38,12 @@ public class CrackerEngineRSA
         BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
         d = e.modInverse(phi);
         BigInteger message = new BigInteger(Base64.getDecoder().decode(encryptedMessage));
-        return new String(message.modPow(d, n).toByteArray());
+        BigInteger plain = message.modPow(d, n);
+        if (plain == null) {
+            return "";
+        }
+        byte[] plainBytes = plain.toByteArray();
+        return new String(plainBytes);
     }
 
     private List<BigInteger> factorize(BigInteger n) {

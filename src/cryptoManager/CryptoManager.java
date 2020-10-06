@@ -174,8 +174,9 @@ public class CryptoManager implements ICryptoManager
 
             for (Future<String> future : futures) {
                 if (!future.isCancelled()) {
-                    successful.add(future.get());
-                    //return future.get();
+                    if (future.get() != null) {
+                        successful.add(future.get());
+                    }
                 }
             }
             if (successful.size() > 0) {
